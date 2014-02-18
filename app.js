@@ -1,40 +1,48 @@
 var gpApp = angular.module("gpApp", []);
 
+gpApp.service("predictionDataService", function(){
+	return {
+		races : [
+			{ id:0, name : "Select race"},
+			{ id:1, name : "Australian Grandpree"},
+			{ id:2, name : "UK Grandpree"},
+			{ id:3, name : "French Grandpree"},
+			{ id:4, name : "German Grandpree"},
+		],
 
-gpApp.controller("PredictionCtrl", function StoryCtrl($scope){
-	
+		drivers : [
+			{ id : "1", name : "Driver 1", selected : false},
+			{ id : "2", name : "Driver 2", selected : false},
+			{ id : "3", name : "Driver 3", selected : false},
+			{ id : "4", name : "Driver 4", selected : false},
+			{ id : "5", name : "Driver 21", selected : false},
+			{ id : "6", name : "Driver 22", selected : false},
+			{ id : "7", name : "Driver 23", selected : false},
+			{ id : "8", name : "Driver 24", selected : false},
+		]
+	};
+});
+
+gpApp.controller("PredictionCtrl", function StoryCtrl($scope, predictionDataService){
+
+	$scope.races = predictionDataService.races;
+	$scope.drivers = predictionDataService.drivers;
 
 	$scope.maxPointsUsed = function(){
 		return $scope.totalPoints() === 10;
 	}
 
-	$scope.races = [
-		{ id:0, name : "Select race"},
-		{ id:1, name : "Australian Grandpree"},
-		{ id:2, name : "UK Grandpree"},
-		{ id:3, name : "French Grandpree"},
-		{ id:4, name : "German Grandpree"},
-	];
-
 	$scope.selectedRace = function(){
 		var race = $scope.races[$scope.selectedRaceId];
 		var raceName = race.name;
+		$scope.racePrediction.name = raceName;
+		//alert($scope.racePrediction );
+		console.log(JSON.stringify($scope.racePrediction));
 		return raceName;
 	};
 
-	$scope.drivers = [
-		{ id : "1", name : "Driver 1", selected : false},
-		{ id : "2", name : "Driver 2", selected : false},
-		{ id : "3", name : "Driver 3", selected : false},
-		{ id : "4", name : "Driver 4", selected : false},
-		{ id : "5", name : "Driver 21", selected : false},
-		{ id : "6", name : "Driver 22", selected : false},
-		{ id : "7", name : "Driver 23", selected : false},
-		{ id : "8", name : "Driver 24", selected : false},
-	];
-
 	$scope.racePrediction = {
-		name : "Uk Grand Prix",
+		name : "",
 		predictions : []
 	};
 
