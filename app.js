@@ -2,11 +2,10 @@ var gpApp = angular.module("gpApp", []);
 
 
 gpApp.controller("PredictionCtrl", function StoryCtrl($scope){
-	//$scope.stories = storyService.stories;
-	$scope.totalPoints = 0;
+
 
 	$scope.maxPointsUsed = function(){
-		return $scope.totalPoints === 10;
+		return $scope.totalPoints() === 10;
 	}
 
 	$scope.drivers = [
@@ -26,9 +25,7 @@ gpApp.controller("PredictionCtrl", function StoryCtrl($scope){
 	$scope.driverSelectionChanged = function(driver){
 
 		var findDriver = function(prediction) { return prediction.driverName === driver.name};
-
 		var existPredictionEntry = _.find($scope.racePrediction.predictions, findDriver);
-
 		if (driver.selected === "true" && existPredictionEntry === undefined){
 			var predictionEntry = {driverName: driver.name, 
 				points : {grid : 0, podium : 0, retire: 0}, selected: false, totalPoints:0};
@@ -68,7 +65,6 @@ gpApp.controller("PredictionCtrl", function StoryCtrl($scope){
 
 		prediction.points[field] = prediction.points[field] + 1;
 		prediction.totalPoints +=1;
-		//$scope.totalPoints += 1
 	}
 
 	$scope.decrease = function(prediction, field){
@@ -76,7 +72,6 @@ gpApp.controller("PredictionCtrl", function StoryCtrl($scope){
 			return;
 		prediction.points[field] = prediction.points[field] - 1;
 		prediction.totalPoints -=1;
-		//$scope.totalPoints -=1;
 	}
 
 });
