@@ -2,11 +2,25 @@ var gpApp = angular.module("gpApp", []);
 
 
 gpApp.controller("PredictionCtrl", function StoryCtrl($scope){
-
+	
 
 	$scope.maxPointsUsed = function(){
 		return $scope.totalPoints() === 10;
 	}
+
+	$scope.races = [
+		{ id:0, name : "Select race"},
+		{ id:1, name : "Australian Grandpree"},
+		{ id:2, name : "UK Grandpree"},
+		{ id:3, name : "French Grandpree"},
+		{ id:4, name : "German Grandpree"},
+	];
+
+	$scope.selectedRace = function(){
+		var race = $scope.races[$scope.selectedRaceId];
+		var raceName = race.name;
+		return raceName;
+	};
 
 	$scope.drivers = [
 		{ id : "1", name : "Driver 1", selected : false},
