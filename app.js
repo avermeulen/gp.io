@@ -13,6 +13,10 @@ gpApp.controller("PredictionCtrl", function StoryCtrl($scope){
 		{ id : "2", name : "Driver 2", selected : false},
 		{ id : "3", name : "Driver 3", selected : false},
 		{ id : "4", name : "Driver 4", selected : false},
+		{ id : "5", name : "Driver 21", selected : false},
+		{ id : "6", name : "Driver 22", selected : false},
+		{ id : "7", name : "Driver 23", selected : false},
+		{ id : "8", name : "Driver 24", selected : false},
 	];
 
 	$scope.racePrediction = {

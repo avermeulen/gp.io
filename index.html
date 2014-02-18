@@ -42,7 +42,6 @@
      <div class="container" ng-controller="PredictionCtrl">
       <div class="row">
         <div class="col-md-3">
-
           <h2>{{racePrediction.name}}</h2>
           <h3>Total points: {{totalPoints()}}</h3>
           <h3>{{pointsPerCategory()}}</h3>
@@ -50,21 +49,24 @@
             <!--
             <button type="button" class="btn btn-primary btn-lg btn-block">Select drivers</button>
             -->
-
+            <h3>Select drivers</h3>
             <div class="checkbox" ng-repeat="driver in drivers">
               <label>
-              <input type="checkbox"
+                <input type="checkbox"
                   name="select_driver_{{driver.id}}" 
                   ng-model="driver.selected"
                   ng-selected="driverSelectionChanged(driver)"  
                   ng-true-value="true"
                   ng-false-value="false"
                   > {{driver.name}}
-            </label>
-          </div>
-        </div>  
+              </label>
+            </div>
+          </div>  
         </div>
+      </div>
+      <div class="row">
         <div class="col-md-3" ng-repeat="prediction in racePrediction.predictions" >
+          <h3>Race prediction</h3>
           <div class="panel panel-default">
               <div class="panel-heading">
                 {{prediction.driverName}}
@@ -77,11 +79,13 @@
                         ng-click="increase(prediction, predictionType)">
                       <span class="glyphicon glyphicon-chevron-up"></span>
                     </button>
-                    <a href="#">{{predictionType}}<span class="badge" >{{prediction.points[predictionType]}}</span></a>
+                    <span class="badge" >{{prediction.points[predictionType]}}</span>
                     <button type="button" class="btn btn-primary btn-xs" 
                         ng-click="decrease(prediction, predictionType)">
                       <span class="glyphicon glyphicon-chevron-down"></span>
                     </button>
+                    <strong>{{predictionType}}</strong>
+                    
                   </div>
                 </div>
               </div>
