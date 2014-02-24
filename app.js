@@ -50,12 +50,16 @@ gpApp.controller("PredictionCtrl", function StoryCtrl($scope, predictionDataServ
 
 	$scope.races = predictionDataService.races;
 	$scope.drivers = predictionDataService.drivers;
+	$scope.driverSelectionVisible = false;
 
 	$scope.maxPointsUsed = function(){
 		return $scope.totalPoints() === 10;
 	}
 
 	$scope.selectedRace = function(){
+		if ($scope.selectedRaceId === undefined)
+			return;
+		
 		var race = $scope.races[$scope.selectedRaceId];
 		var raceName = race.name;
 		$scope.racePrediction.name = raceName;
@@ -63,10 +67,31 @@ gpApp.controller("PredictionCtrl", function StoryCtrl($scope, predictionDataServ
 		return raceName;
 	};
 
+	$scope.showOrHideDriverSelection = function(showOrHide){
+		$scope.driverSelectionVisible = showOrHide;
+	}
+
+	$scope.changeRaceSelection = function(){
+		//alert("change selection!");
+
+		var empty = {
+			name : "",
+			predictions : []
+		};
+
+		_.each($scope.drivers, function(driver){
+			driver.selected = false;
+		});
+
+		$scope.racePrediction = empty;
+	}
+
+	/*
 	$scope.racePrediction = {
 		name : "",
 		predictions : []
 	};
+	*/
 
 	$scope.predictionTypes = ["grid", "retire", "podium"];
 
@@ -77,7 +102,6 @@ gpApp.controller("PredictionCtrl", function StoryCtrl($scope, predictionDataServ
 	$scope.totalPoints = function(){
 		if ($scope.racePrediction === undefined)
 			return 0;
-
 		var total = _.reduce($scope.racePrediction.predictions, 
 			function(t, pred) {
 				return t + pred.totalPoints
