@@ -52,6 +52,10 @@ gpApp.controller("PredictionCtrl", function StoryCtrl($scope, predictionDataServ
 	$scope.drivers = predictionDataService.drivers;
 	$scope.driverSelectionVisible = false;
 
+	$scope.context = {};
+	
+	$scope.predictionTypes = ["grid", "retire", "podium"];
+
 	$scope.maxPointsUsed = function(){
 		return $scope.totalPoints() === 10;
 	}
@@ -62,8 +66,7 @@ gpApp.controller("PredictionCtrl", function StoryCtrl($scope, predictionDataServ
 		
 		var race = $scope.races[$scope.selectedRaceId];
 		var raceName = race.name;
-		$scope.racePrediction.name = raceName;
-		//console.log(JSON.stringify($scope.racePrediction));
+		//$scope.racePrediction.name = raceName;
 		return raceName;
 	};
 
@@ -72,31 +75,32 @@ gpApp.controller("PredictionCtrl", function StoryCtrl($scope, predictionDataServ
 	}
 
 	$scope.changeRaceSelection = function(){
-		//alert("change selection!");
+		if ($scope.selectedRace() === "")
+			return;
 
 		var empty = {
-			name : "",
+			name : $scope.selectedRace(),
 			predictions : []
 		};
 
-		_.each($scope.drivers, function(driver){
-			driver.selected = false;
-		});
+		if ($scope.racePrediction !== undefined)
+			$scope.context[$scope.racePrediction.name] = $scope.racePrediction;
 
-		$scope.racePrediction = empty;
+		$scope.racePrediction = $scope.context[$scope.selectedRace()] || empty;
+
+		//todo move to a seperate method
+		var selectedDrivers = _.pluck($scope.racePrediction.predictions, "driverName");
+		_.each($scope.drivers, function(driver){	
+			if (_.contains(selectedDrivers, driver.name))
+				driver.selected = "true";
+			else
+				driver.selected = "false";
+		});
 	}
 
-	/*
-	$scope.racePrediction = {
-		name : "",
-		predictions : []
-	};
-	*/
-
-	$scope.predictionTypes = ["grid", "retire", "podium"];
-
 	$scope.driverSelectionChanged = function(driver){
-		predictionManager.selectDriver(driver, $scope.racePrediction.predictions);
+		if ($scope.racePrediction !== undefined)
+			predictionManager.selectDriver(driver, $scope.racePrediction.predictions);
 	};
 
 	$scope.totalPoints = function(){
@@ -110,6 +114,9 @@ gpApp.controller("PredictionCtrl", function StoryCtrl($scope, predictionDataServ
 	};
 
 	$scope.pointsPerCategory = function(){
+		var empty = {grid : 0, podium : 0, retire: 0};
+		if ($scope.racePrediction === undefined)
+			return empty;
 		return _.reduce(
 			$scope.racePrediction.predictions, 
 			function(initialPoints, prediction){
@@ -118,7 +125,7 @@ gpApp.controller("PredictionCtrl", function StoryCtrl($scope, predictionDataServ
 				initialPoints.retire += points.retire ? points.retire : 0;
 				initialPoints.podium += points.podium ? points.podium : 0;
 				return initialPoints;
-			}, {grid : 0, podium : 0, retire: 0});
+			}, empty);
 	};
 
 	$scope.increase = function(prediction, field){
