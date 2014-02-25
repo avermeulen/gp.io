@@ -26,21 +26,22 @@ gpApp.service("predictionManager", function(){
 	var predictionPointsManager = {};
 
 	predictionPointsManager.selectDriver = function(driver, predictions){
-
 		var findDriver = function(prediction) { 
 			return prediction.driverName === driver.name
 		};
 
 		var existPredictionEntry = _.find(predictions, findDriver);
 		if (driver.selected === "true" && existPredictionEntry === undefined){
-			var predictionEntry = {driverName: driver.name, 
-				points : {grid : 0, podium : 0, retire: 0}, selected: false, totalPoints:0};
+			var predictionEntry = {
+				driverName: driver.name, 
+				points : {grid : 0, podium : 0, retire: 0}, 
+				selected: false, totalPoints:0
+			};
 			predictions.push(predictionEntry);
 		}
 		else if (driver.selected === "false" && existPredictionEntry !== undefined){
 			_.remove(predictions, findDriver);
 		}
-
 	};
 
 	return predictionPointsManager;
@@ -62,11 +63,9 @@ gpApp.controller("PredictionCtrl", function StoryCtrl($scope, predictionDataServ
 
 	$scope.selectedRace = function(){
 		if ($scope.selectedRaceId === undefined)
-			return;
-		
+			return;		
 		var race = $scope.races[$scope.selectedRaceId];
 		var raceName = race.name;
-		//$scope.racePrediction.name = raceName;
 		return raceName;
 	};
 
@@ -141,5 +140,13 @@ gpApp.controller("PredictionCtrl", function StoryCtrl($scope, predictionDataServ
 		prediction.points[field] = prediction.points[field] - 1;
 		prediction.totalPoints -=1;
 	};
+
+	$scope.submitPrediction = function(prediction){
+		$scope.racePrediction.submitted = true;
+	}
+
+	$scope.reopenPrediction = function(prediction){
+		$scope.racePrediction.submitted = false;
+	}
 
 });
