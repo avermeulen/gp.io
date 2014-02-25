@@ -3,7 +3,7 @@ var gpApp = angular.module("gpApp", []);
 gpApp.service("predictionDataService", function(){
 	return {
 		races : [
-			{ id:0, name : "Select race"},
+			//{ id:0, name : "Select race"},
 			{ id:1, name : "Australian Grandpree"},
 			{ id:2, name : "UK Grandpree"},
 			{ id:3, name : "French Grandpree"},
@@ -64,7 +64,7 @@ gpApp.controller("PredictionCtrl", function StoryCtrl($scope, predictionDataServ
 	$scope.selectedRace = function(){
 		if ($scope.selectedRaceId === undefined)
 			return;		
-		var race = $scope.races[$scope.selectedRaceId];
+		var race = _.find($scope.races, function(race) {return race.id === $scope.selectedRaceId });
 		var raceName = race.name;
 		return raceName;
 	};

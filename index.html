@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap 101 Template</title>
+    <title>gp.io</title>
 
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -39,9 +39,9 @@
      </nav>
      <div class="container">
      </div>
-     <div class="container" ng-controller="PredictionCtrl">
+     <div class="container" ng-controller="PredictionCtrl" ng-cloak>
       <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-4">
           <h3>Select race</h3>
           <select class="form-control" ng-model="selectedRaceId" 
               ng-init="foo = foo || races[0]" ng-options="race.id as race.name for race in races"
@@ -50,12 +50,15 @@
         </div>
       </div>
       <div class="row" ng-show="selectedRace()">
-        <div class="col-md-3">
+        <div class="col-md-4">
           <h2>{{selectedRace()}}</h2>
-          <h3>Total points: {{totalPoints()}}</h3>
-          <h3>{{pointsPerCategory()}}</h3>
-          
           <div class="form-group">
+            <div class="well">
+              <h4>Total points: <span class="label label-info">{{totalPoints()}}</span></h4>
+              Grid: <span class="label label-warning">{{pointsPerCategory()['grid']}}</span>  
+              Retire: <span class="label label-danger">{{pointsPerCategory()['retire']}}</span>
+              Podium: <span class="label label-success">{{pointsPerCategory()['podium']}}</span>
+            </div>
             <div ng-hide="driverSelectionVisible || racePrediction.submitted">
               <a href="#" class="btn btn-primary btn-lg active" role="button" ng-click="showOrHideDriverSelection(true)">
                 Manage drivers
