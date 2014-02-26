@@ -1,9 +1,42 @@
 var gpApp = angular.module("gpApp", []);
 
-gpApp.service("predictionDataService", function(){
+gpApp.service("_dataStore", function(){
+	return {
+		context : {},
+		set : function(key, value){
+			if (value !== undefined)
+				this.context[key] = value;
+		},
+		get : function(key){
+			return this.context[key];
+		}
+	}
+}); 
 
-	var predictionDataService = {}, 
-		context = {};
+gpApp.service("dataStore", function(){
+	return {
+		context : {},
+		set : function(key, value){
+			if (value !== undefined)
+				localStorage[key] = JSON.stringify(value);
+		},
+		get : function(key){
+			if (key === undefined)
+				return undefined;
+			
+			var value = localStorage[key];
+			if (value !== undefined)
+				return JSON.parse(value);
+			else
+				return undefined;
+		}
+	}
+}); 
+
+gpApp.service("predictionDataService", function(dataStore){
+
+	var predictionDataService = {}; 
+		//context = {};
 		
 	predictionDataService.races = [
 			//{ id:0, name : "Select race"},
@@ -27,16 +60,19 @@ gpApp.service("predictionDataService", function(){
 	predictionDataService.storePrediction = function(predictionDetails){
 		if (predictionDetails !== undefined && predictionDetails.racePrediction !== undefined){
 			var racePrediction = predictionDetails.racePrediction;
-
-			context[racePrediction.name] = racePrediction;
+			dataStore.set(racePrediction.name, racePrediction);
+			//context[racePrediction.name] = racePrediction;
 		}
 	};
 
 	predictionDataService.findPrediction = function(predictionDetails){
-		return context[predictionDetails.raceName] || {
+		// context[predictionDetails.raceName]
+		var prediction = dataStore.get(predictionDetails.raceName) || {
 			name : predictionDetails.raceName,
 			predictions : []
 		};
+
+		return prediction;
 	};
 
 	return predictionDataService;
@@ -64,8 +100,6 @@ gpApp.service("predictionManager", function(){
 		}
 	};
 
-	//$scope.drivers
-	//$scope.racePrediction.predictions
 	predictionManager.manageDriverSelection = function(drivers, predictions){
 		var selectedDrivers = _.pluck(predictions, "driverName");
 		_.each(drivers, function(driver){	
