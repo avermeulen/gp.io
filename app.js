@@ -1,4 +1,13 @@
-var gpApp = angular.module("gpApp", []);
+var gpApp = angular.module("gpApp", ['ngRoute']);
+
+
+gpApp.controller("RegisterCtrl", function(){
+
+});
+
+gpApp.controller("LoginCtrl", function(){
+
+});
 
 gpApp.service("_dataStore", function(){
 	return {
@@ -204,5 +213,24 @@ gpApp.controller("PredictionCtrl", function StoryCtrl($scope, predictionDataServ
 	$scope.reopenPrediction = function(prediction){
 		$scope.racePrediction.submitted = false;
 	}
+});
+
+gpApp.config(function($routeProvider, $locationProvider){
+	$routeProvider.when("/register", 
+	{
+		templateUrl : "templates/register.html",
+		controller : "RegisterCtrl"
+	});
+	$routeProvider.when("/login", 
+	{
+		templateUrl : "templates/login.html",
+		controller : "LoginCtrl"
+	});
+	$routeProvider.when("/predictions", 
+	{
+		templateUrl : "templates/prediction.html",
+		controller : "PredictionCtrl"
+	});
+
 
 });

@@ -1,0 +1,81 @@
+<div class="container" ng-cloak>
+  <div class="row">
+    <div class="col-md-4">
+      <h1>Select race</h1>
+      <select class="form-control" ng-model="selectedRaceId" 
+          ng-init="foo = foo || races[0]" ng-options="race.id as race.name for race in races"
+          ng-change="changeRaceSelection()">
+      </select>
+    </div>
+  </div>
+  <div class="row" ng-show="selectedRace()">
+    <div class="col-md-4">
+      <h2>{{selectedRace()}}</h2>
+      <div class="form-group">
+        <div class="well">
+          <h4>Total points: <span class="label label-info">{{totalPoints()}}</span></h4>
+          Grid: <span class="label label-warning">{{pointsPerCategory()['grid']}}</span>  
+          Retire: <span class="label label-danger">{{pointsPerCategory()['retire']}}</span>
+          Podium: <span class="label label-success">{{pointsPerCategory()['podium']}}</span>
+        </div>
+        <div ng-hide="driverSelectionVisible || racePrediction.submitted">
+          <input class="btn btn-primary btn-lg active" ng-click="showOrHideDriverSelection(true)" value="Manage drivers">
+        </div>
+        <div ng-show="driverSelectionVisible" class="well" >
+          <h3>Select drivers</h3>
+            <div class="checkbox" ng-repeat="driver in drivers">
+              <label>
+                <input type="checkbox"
+                  name="select_driver_{{driver.id}}" 
+                  ng-model="driver.selected"
+                  ng-selected="driverSelectionChanged(driver)"  
+                  ng-true-value="true"
+                  ng-false-value="false"
+                  > {{driver.name}}
+              </label>
+            </div>
+            <input type="button" class="btn btn-primary btn-lg" ng-click="showOrHideDriverSelection(false)" 
+              value="Hide driver selection">
+          </div>
+        </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-3" ng-repeat="prediction in racePrediction.predictions" >
+      <h3>Race prediction</h3>
+      <div class="panel panel-default">
+          <div class="panel-heading">
+            {{prediction.driverName}}
+          </div>
+          <h4>{{prediction.totalPoints}}</h4>
+          <div class="form-group">
+            <div>
+              <div ng-repeat="predictionType in predictionTypes">
+                <button type="button" class="btn btn-primary btn-xs" 
+                    ng-click="increase(prediction, predictionType)">
+                  <span class="glyphicon glyphicon-chevron-up"></span>
+                </button>
+                <span class="badge" >{{prediction.points[predictionType]}}</span>
+                <button type="button" class="btn btn-primary btn-xs" 
+                    ng-click="decrease(prediction, predictionType)">
+                  <span class="glyphicon glyphicon-chevron-down"></span>
+                </button>
+                <strong>{{predictionType}}</strong>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+  <div class="row">
+    <div class="col-md-3">
+      <input type="button" value="Submit" class="btn btn-success btn-lg" 
+      ng-show="maxPointsUsed() && racePrediction.submitted !== true" 
+      ng-click="submitPrediction()">
+      <input type="button" value="Unsubmit" class="btn btn-warning btn-lg" 
+      ng-show="racePrediction.submitted === true" 
+      ng-click="reopenPrediction()">
+    </div>
+  </div>
+</div><!-- /.container -->

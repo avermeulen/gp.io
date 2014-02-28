@@ -5,10 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>gp.io</title>
-
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
-
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -31,107 +29,24 @@
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
             <li class="active"><a href="#">Home</a></li>
-            <li><a href="#predictions">Predictions</a></li>
+            <li><a href="#/predictions">Predictions</a></li>
             <li><a href="#profile">Profile</a></li>
-            <li><a href="#register">Register</a></li>
+            <li><a href="#/register">Register</a></li>
             <li><a href="#about">About</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>  
      </nav>
      <div class="container">
+        <ng-view>
+        </ng-view>   
      </div>
-     <div class="container" ng-controller="PredictionCtrl" ng-cloak>
-      <div class="row">
-        <div class="col-md-4">
-          <h3>Select race</h3>
-          <select class="form-control" ng-model="selectedRaceId" 
-              ng-init="foo = foo || races[0]" ng-options="race.id as race.name for race in races"
-              ng-change="changeRaceSelection()">
-          </select>
-        </div>
-      </div>
-      <div class="row" ng-show="selectedRace()">
-        <div class="col-md-4">
-          <h2>{{selectedRace()}}</h2>
-          <div class="form-group">
-            <div class="well">
-              <h4>Total points: <span class="label label-info">{{totalPoints()}}</span></h4>
-              Grid: <span class="label label-warning">{{pointsPerCategory()['grid']}}</span>  
-              Retire: <span class="label label-danger">{{pointsPerCategory()['retire']}}</span>
-              Podium: <span class="label label-success">{{pointsPerCategory()['podium']}}</span>
-            </div>
-            <div ng-hide="driverSelectionVisible || racePrediction.submitted">
-              <a href="#" class="btn btn-primary btn-lg active" role="button" ng-click="showOrHideDriverSelection(true)">
-                Manage drivers
-              </a>
-            </div>
-            <div ng-show="driverSelectionVisible" >
-              <h3>Select drivers</h3>
-                        <div class="checkbox" ng-repeat="driver in drivers">
-                          <label>
-                            <input type="checkbox"
-                              name="select_driver_{{driver.id}}" 
-                              ng-model="driver.selected"
-                              ng-selected="driverSelectionChanged(driver)"  
-                              ng-true-value="true"
-                              ng-false-value="false"
-                              > {{driver.name}}
-                          </label>
-                        </div>
-                        <a href="#" class="btn btn-primary btn-lg active" role="button" 
-                            ng-click="showOrHideDriverSelection(false)">
-                          Hide driver selection
-                        </a>
-              </div>
-            </div>
-
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-3" ng-repeat="prediction in racePrediction.predictions" >
-          <h3>Race prediction</h3>
-          <div class="panel panel-default">
-              <div class="panel-heading">
-                {{prediction.driverName}}
-              </div>
-              <h4>{{prediction.totalPoints}}</h4>
-              <div class="form-group">
-                <div>
-                  <div ng-repeat="predictionType in predictionTypes">
-                    <button type="button" class="btn btn-primary btn-xs" 
-                        ng-click="increase(prediction, predictionType)">
-                      <span class="glyphicon glyphicon-chevron-up"></span>
-                    </button>
-                    <span class="badge" >{{prediction.points[predictionType]}}</span>
-                    <button type="button" class="btn btn-primary btn-xs" 
-                        ng-click="decrease(prediction, predictionType)">
-                      <span class="glyphicon glyphicon-chevron-down"></span>
-                    </button>
-                    <strong>{{predictionType}}</strong>
-                    
-                  </div>
-                </div>
-              </div>
-              
-            </div>
-          </div>
-      </div>
-      <div class="row">
-        <div class="col-md-3">
-          <input type="button" value="Submit" class="btn" 
-          ng-show="maxPointsUsed() && racePrediction.submitted !== true" 
-          ng-click="submitPrediction()">
-          <input type="button" value="Unsubmit" class="btn" 
-          ng-show="racePrediction.submitted === true" 
-          ng-click="reopenPrediction()">
-        </div>
-      </div>
-    </div><!-- /.container -->
+     
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://code.jquery.com/jquery.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/angular.js"></script>
+    <script src="js/angular-route.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/lodash.js"></script>
     <script src="app.js"></script>
