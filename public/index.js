@@ -1,6 +1,41 @@
-var gpApp = angular.module("gpApp", ['ngRoute']);
+var gpApp = angular.module("gpApp", ["ngRoute", "ngCookies"])
+	.run(function($rootScope, $http, $cookieStore){
+		$rootScope.message = '';
 
-gpApp.controller("RegisterCtrl", function(){
+    	// Logout function is available in any pages
+    	$rootScope.logout = function(){
+      		$rootScope.message = 'Logged out.';
+      		$http.post('/logout');
+    	};
+
+    	$rootScope.loggedInUser = function($session){
+    		var user = $cookieStore.get("user");
+    		if (user !== undefined)
+    			return user.name;
+    	}
+
+    	$rootScope.loggedIn = function($session){
+    		var user = $cookieStore.get("user");
+    		return user !== undefined;
+    	}
+	});
+
+gpApp.controller("RegisterCtrl", function($scope, $rootScope, $http, $location){
+
+	$scope.user = {};
+
+	$scope.register = function(){
+
+		var loginDetails = {
+			username : $scope.user.username,
+			password : $scope.user.password
+		};
+
+		$http.post("/register", loginDetails).success(function(){
+					$rootScope.message = 'Registration successful! Please login.';	
+					$location.url("/login");
+			});
+	};
 
 });
 
@@ -232,8 +267,9 @@ gpApp.controller("PredictionCtrl",
 	}
 });
 
+/*
 gpApp.controller("LogoutCtrl", 
-  	function($scope, $location, $http){
+  	function($scope, $rootScope, $location, $http){
 		$scope.logout = function(){
 			$http
 				.post("/logout", {logout : "true"})
@@ -243,6 +279,7 @@ gpApp.controller("LogoutCtrl",
 				});
 		};
 });
+*/
 
 gpApp.config(function($routeProvider, $locationProvider, $httpProvider){
 	$routeProvider.when("/register", 
@@ -280,6 +317,24 @@ gpApp.config(function($routeProvider, $locationProvider, $httpProvider){
 		}
 	});
 
+	/*
+	$httpProvider.interceptors.push(function($q, $location) {
+    	return {
+     		"request": function(config) {
+         		// same as above
+         		return config || $q.when(config);
+      		},
+ 
+      		"response": function(response) {
+        		// same as above
+        		if (response.status === 401)
+              		$location.url('/login');
+            	return $q.reject(response);
+      		}
+    	};
+  	});
+	*/
+	
 	$httpProvider.responseInterceptors.push(function($q, $location) {
       return function(promise) {
         return promise.then(
@@ -296,7 +351,7 @@ gpApp.config(function($routeProvider, $locationProvider, $httpProvider){
         );
       }
     });
-
+	
 });
 
 

@@ -2,16 +2,20 @@ var express = require('express'),
     http = require('http'),
     path = require('path'),
     passport = require('passport'),
-    LocalStrategy = require('passport-local').Strategy;
+    LocalStrategy = require('passport-local').Strategy,
+    users = {};
 
 //==================================================================
 // Define the strategy to be used by PassportJS
 passport.use(new LocalStrategy(
   function(username, password, done) {
-    console.log("=> " + username + ":" + password);
-    if (username === "admin" && password === "admin") // stupid example
-      return done(null, {name: "admin"});
+    //console.log("=> " + username + ":" + password);
+    var userPassword = users[username];
+    console.log(users);
 
+    if (userPassword != undefined && userPassword === password){
+      return done(null, {name: username});
+    }
     return done(null, false, { message: 'Incorrect username.' });
   }
 ));
@@ -65,7 +69,7 @@ app.get('/', function(req, res){
 });
 
 app.get('/users', auth, function(req, res){
-  res.send([{name: "user1"}, {name: "user2"}]);
+  res.send(users);
 });
 //==================================================================
 
@@ -78,12 +82,35 @@ app.get('/loggedin', function(req, res) {
 // route to log in
 app.post('/login', passport.authenticate('local'), 
   function(req, res) {
+    
+    res.cookie("user", JSON.stringify(req.user));
+
     res.send(req.user);
+});
+
+// route to log in
+app.post('/register', 
+  function(req, res) {
+    
+    var username = req.body.username,
+        password = req.body.password;
+
+    console.log(req.body);
+    console.log(username);
+    console.log(password);
+
+    users[username] = password;
+
+    res.send({
+      status : "success",
+      username : username
+    });
 });
 
 // route to log out
 app.post('/logout', function(req, res){
   req.logOut();
+  res.clearCookie("user");
   res.send(200);
 });
 //==================================================================
