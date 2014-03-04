@@ -19,7 +19,7 @@
           Podium: <span class="label label-success">{{pointsPerCategory()['podium']}}</span>
         </div>
         <div ng-hide="driverSelectionVisible || racePrediction.submitted">
-          <input class="btn btn-primary btn-lg active" ng-click="showOrHideDriverSelection(true)" value="Manage drivers">
+          <input class="btn btn-primary btn-block active" ng-click="showOrHideDriverSelection(true)" value="Manage drivers">
         </div>
         <div ng-show="driverSelectionVisible" class="well" >
           <h3>Select drivers</h3>
@@ -34,7 +34,7 @@
                   > {{driver.name}}
               </label>
             </div>
-            <input type="button" class="btn btn-primary btn-lg" ng-click="showOrHideDriverSelection(false)" 
+            <input type="button" class="btn btn-primary btn-block" ng-click="showOrHideDriverSelection(false)" 
               value="Hide driver selection">
           </div>
         </div>

@@ -1,13 +1,14 @@
-var express = require('express');
-var http = require('http');
-var path = require('path');
-var passport = require('passport');
-var LocalStrategy = require('passport-local').Strategy;
+var express = require('express'),
+    http = require('http'),
+    path = require('path'),
+    passport = require('passport'),
+    LocalStrategy = require('passport-local').Strategy;
 
 //==================================================================
 // Define the strategy to be used by PassportJS
 passport.use(new LocalStrategy(
   function(username, password, done) {
+    console.log("=> " + username + ":" + password);
     if (username === "admin" && password === "admin") // stupid example
       return done(null, {name: "admin"});
 
@@ -26,6 +27,7 @@ passport.deserializeUser(function(user, done) {
 
 // Define a middleware function to be used for every secured routes
 var auth = function(req, res, next){
+  console.log("*** auth!!");
   if (!req.isAuthenticated()) 
   	res.send(401);
   else
@@ -38,8 +40,8 @@ var app = express();
 
 // all environments
 app.set('port', process.env.PORT || 3000);
-app.set('views', __dirname + '/public');
-app.set('view engine', 'ejs');
+//app.set('views', __dirname + '/public');
+//app.set('view engine', 'ejs');
 app.use(express.favicon());
 app.use(express.logger('dev'));
 app.use(express.cookieParser()); 
@@ -59,7 +61,7 @@ if ('development' == app.get('env')) {
 //==================================================================
 // routes
 app.get('/', function(req, res){
-  res.render('index', { title: 'Express' });
+  res.render('index.html');
 });
 
 app.get('/users', auth, function(req, res){
@@ -74,8 +76,9 @@ app.get('/loggedin', function(req, res) {
 });
 
 // route to log in
-app.post('/login', passport.authenticate('local'), function(req, res) {
-  res.send(req.user);
+app.post('/login', passport.authenticate('local'), 
+  function(req, res) {
+    res.send(req.user);
 });
 
 // route to log out

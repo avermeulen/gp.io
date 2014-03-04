@@ -4,8 +4,25 @@ gpApp.controller("RegisterCtrl", function(){
 
 });
 
-gpApp.controller("LoginCtrl", function(){
+gpApp.controller("LoginCtrl", function($scope, $rootScope, $http, $location){
+	$scope.user = {};
 
+	$scope.login = function () {
+
+		var loginDetails = {
+			username : $scope.user.username,
+			password : $scope.user.password
+		};
+
+		$http.post('/login', loginDetails)
+		.success(function(user){
+		    $rootScope.message = 'Authentication successful!';	
+			$location.url("/predictions");
+		}).error(function(){
+			$rootScope.message = 'Authentication failed!';
+			$location.url("/login");
+		});
+	}
 });
 
 gpApp.service("_dataStore", function(){
@@ -16,6 +33,7 @@ gpApp.service("_dataStore", function(){
 				this.context[key] = value;
 		},
 		get : function(key){
+			$rootScope.message = 'Authentication failed.';
 			return this.context[key];
 		}
 	}
@@ -147,8 +165,8 @@ gpApp.service("predictionManager", function(){
 	return predictionManager;
 });
 
-gpApp.controller("PredictionCtrl", function StoryCtrl($scope, predictionDataService, predictionManager){
-
+gpApp.controller("PredictionCtrl", 
+  function StoryCtrl($scope, $location, $http, predictionDataService, predictionManager){
 	$scope.races = predictionDataService.races;
 	$scope.drivers = predictionDataService.drivers;
 	$scope.driverSelectionVisible = false;
@@ -214,7 +232,19 @@ gpApp.controller("PredictionCtrl", function StoryCtrl($scope, predictionDataServ
 	}
 });
 
-gpApp.config(function($routeProvider, $locationProvider){
+gpApp.controller("LogoutCtrl", 
+  	function($scope, $location, $http){
+		$scope.logout = function(){
+			$http
+				.post("/logout", {logout : "true"})
+				.success(function(){
+					$rootScope.message = "Logged out";
+					$location.url('/login');
+				});
+		};
+});
+
+gpApp.config(function($routeProvider, $locationProvider, $httpProvider){
 	$routeProvider.when("/register", 
 	{
 		templateUrl : "templates/register.html",
@@ -228,8 +258,45 @@ gpApp.config(function($routeProvider, $locationProvider){
 	$routeProvider.when("/predictions", 
 	{
 		templateUrl : "templates/prediction.html",
-		controller : "PredictionCtrl"
+		controller : "PredictionCtrl",
+		resolve : {
+			loggedin : function($q, $timeout, $http, $location, $rootScope){
+
+				var deferred = $q.defer();
+
+				$http.get("/loggedin")
+					.success(function(user){
+						if(user !== "0")
+							$timeout(deferred.resolve, 0);
+						else {
+							$rootScope.message = 'You need to log in.';
+          					$timeout(function(){deferred.reject();}, 0);
+          					$location.url('/login');			
+						}
+					})
+				//$location.url("/login");
+				return deferred.promise;
+			}
+		}
 	});
 
+	$httpProvider.responseInterceptors.push(function($q, $location) {
+      return function(promise) {
+        return promise.then(
+          // Success: just return the response
+          function(response){
+            return response;
+          }, 
+          // Error: check the error status to get only the 401
+          function(response) {
+            if (response.status === 401)
+              $location.url('/login');
+            return $q.reject(response);
+          }
+        );
+      }
+    });
 
 });
+
+
