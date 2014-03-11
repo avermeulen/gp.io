@@ -3,20 +3,28 @@ var express = require('express'),
     path = require('path'),
     passport = require('passport'),
     LocalStrategy = require('passport-local').Strategy,
-    users = {};
+    UserService = require("./user-service"), 
+    async = require("async"),
+    url = "mongodb://127.0.0.1:27017/gp_io",
+    userService = new UserService(url);
+    //users = {};
 
 //==================================================================
 // Define the strategy to be used by PassportJS
 passport.use(new LocalStrategy(
   function(username, password, done) {
-    //console.log("=> " + username + ":" + password);
-    var userPassword = users[username];
-    console.log(users);
-
-    if (userPassword != undefined && userPassword === password){
-      return done(null, {name: username});
-    }
-    return done(null, false, { message: 'Incorrect username.' });
+    var status;
+    async.waterfall([
+      function(callback){
+        userService.login({email : username, password: password}, callback, callback);    
+      }],
+      function(err, result){
+        if (result === "login_success"){
+          status = done(null, {name: username});
+        }
+          status = done(null, false, { message: 'Incorrect username.' });
+      });      
+      return status
   }
 ));
 
@@ -31,7 +39,6 @@ passport.deserializeUser(function(user, done) {
 
 // Define a middleware function to be used for every secured routes
 var auth = function(req, res, next){
-  console.log("*** auth!!");
   if (!req.isAuthenticated()) 
   	res.send(401);
   else
@@ -98,7 +105,7 @@ app.post('/register',
     console.log(req.body);
     console.log(username);
     console.log(password);
-
+    
     users[username] = password;
 
     res.send({
