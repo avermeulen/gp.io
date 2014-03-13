@@ -11,7 +11,7 @@ var gpApp = angular.module("gpApp", ["ngRoute", "ngCookies"])
     	$rootScope.loggedInUser = function($session){
     		var user = $cookieStore.get("user");
     		if (user !== undefined)
-    			return user.name;
+    			return user.name + " " + user.user_id;
     	}
 
     	$rootScope.loggedIn = function($session){
@@ -19,46 +19,6 @@ var gpApp = angular.module("gpApp", ["ngRoute", "ngCookies"])
     		return user !== undefined;
     	}
 	});
-
-gpApp.controller("RegisterCtrl", function($scope, $rootScope, $http, $location){
-
-	$scope.user = {};
-
-	$scope.register = function(){
-
-		var loginDetails = {
-			username : $scope.user.username,
-			password : $scope.user.password
-		};
-
-		$http.post("/register", loginDetails).success(function(){
-					$rootScope.message = 'Registration successful! Please login.';	
-					$location.url("/login");
-			});
-	};
-
-});
-
-gpApp.controller("LoginCtrl", function($scope, $rootScope, $http, $location){
-	$scope.user = {};
-
-	$scope.login = function () {
-
-		var loginDetails = {
-			username : $scope.user.username,
-			password : $scope.user.password
-		};
-
-		$http.post('/login', loginDetails)
-		.success(function(user){
-		    $rootScope.message = 'Authentication successful!';	
-			$location.url("/predictions");
-		}).error(function(){
-			$rootScope.message = 'Authentication failed!';
-			$location.url("/login");
-		});
-	}
-});
 
 gpApp.service("_dataStore", function(){
 	return {
@@ -74,9 +34,8 @@ gpApp.service("_dataStore", function(){
 	}
 }); 
 
-gpApp.service("dataStore", function(){
+gpApp.service("localStorageDataStore", function(){
 	return {
-		context : {},
 		set : function(key, value){
 			if (value !== undefined)
 				localStorage[key] = JSON.stringify(value);
@@ -93,6 +52,39 @@ gpApp.service("dataStore", function(){
 		}
 	}
 }); 
+
+gpApp.service("mongoDataStore", function($http){
+	return {
+		set : function(key, value){
+			if (value !== undefined)
+				$http.post('/prediction', value).success(function(){
+					console.log("prediction submitted")
+				});
+
+				//localStorage[key] = JSON.stringify(value);
+
+		},
+		get : function(key){
+
+			/*
+			if (key === undefined)
+				return undefined;
+			
+			var value = localStorage[key];
+			if (value !== undefined)
+				return JSON.parse(value);
+			else
+				return undefined;
+			*/	
+		}
+	}
+});
+
+gpApp.service("dataStore", function(mongoDataStore, localStorageDataStore){
+	return mongoDataStore;
+	//return localStorageDataStore;
+});
+
 
 gpApp.service("predictionDataService", function(dataStore){
 
@@ -118,10 +110,11 @@ gpApp.service("predictionDataService", function(dataStore){
 			{ id : "8", name : "Driver 24", selected : false}
 		];
 
-	predictionDataService.storePrediction = function(predictionDetails){
+	predictionDataService.storePrediction = function(predictionDetails, user_id){
 		if (predictionDetails !== undefined && predictionDetails.racePrediction !== undefined){
 			var racePrediction = predictionDetails.racePrediction;
-			dataStore.set(racePrediction.name, racePrediction);
+			racePrediction.user_id = user_id;
+			dataStore.set(racePrediction.name, { prediction : JSON.stringify(racePrediction)});
 			//context[racePrediction.name] = racePrediction;
 		}
 	};
@@ -200,86 +193,7 @@ gpApp.service("predictionManager", function(){
 	return predictionManager;
 });
 
-gpApp.controller("PredictionCtrl", 
-  function StoryCtrl($scope, $location, $http, predictionDataService, predictionManager){
-	$scope.races = predictionDataService.races;
-	$scope.drivers = predictionDataService.drivers;
-	$scope.driverSelectionVisible = false;
-	$scope.predictionTypes = ["grid", "retire", "podium"];
 
-	$scope.maxPointsUsed = function(){
-		return $scope.totalPoints() === 10;
-	}
-
-	$scope.selectedRace = function(){
-		if ($scope.selectedRaceId === undefined)
-			return;		
-		var race = _.find($scope.races, function(race) {return race.id === $scope.selectedRaceId });
-		var raceName = race.name;
-		return raceName;
-	};
-
-	$scope.showOrHideDriverSelection = function(showOrHide){
-		$scope.driverSelectionVisible = showOrHide;
-	}
-
-	$scope.changeRaceSelection = function(){
-		if ($scope.selectedRace() === "")
-			return;
-		predictionDataService.storePrediction({racePrediction : $scope.racePrediction});
-		$scope.racePrediction = predictionDataService.findPrediction({raceName : $scope.selectedRace()});
-		predictionManager.manageDriverSelection($scope.drivers, $scope.racePrediction.predictions);
-	}
-
-	$scope.driverSelectionChanged = function(driver){
-		if ($scope.racePrediction !== undefined)
-			predictionManager.selectDriver(driver, $scope.racePrediction.predictions);
-	};
-
-	$scope.totalPoints = function(){
-		return predictionManager.totalPoints($scope.racePrediction);
-	};
-
-	$scope.pointsPerCategory = function(){
-		return predictionManager.groupPointsByType($scope.racePrediction);
-	};
-
-	$scope.increase = function(prediction, field){
-		if ($scope.maxPointsUsed())
-			return;
-		prediction.points[field] = prediction.points[field] + 1;
-		prediction.totalPoints +=1;
-	};
-
-	$scope.decrease = function(prediction, field){
-		if (prediction.points[field] === 0)
-			return;
-		prediction.points[field] = prediction.points[field] - 1;
-		prediction.totalPoints -=1;
-	};
-
-	$scope.submitPrediction = function(prediction){
-		$scope.racePrediction.submitted = true;
-	}
-
-	$scope.reopenPrediction = function(prediction){
-		$scope.racePrediction.submitted = false;
-	}
-});
-
-/*
-gpApp.controller("LogoutCtrl", 
-  	function($scope, $rootScope, $location, $http){
-		$scope.logout = function(){
-			$http
-				.post("/logout", {logout : "true"})
-				.success(function(){
-					$rootScope.message = "Logged out";
-					$location.url('/login');
-				});
-		};
-});
-*/
 
 gpApp.config(function($routeProvider, $locationProvider, $httpProvider){
 	$routeProvider.when("/register", 
@@ -316,24 +230,6 @@ gpApp.config(function($routeProvider, $locationProvider, $httpProvider){
 			}
 		}
 	});
-
-	/*
-	$httpProvider.interceptors.push(function($q, $location) {
-    	return {
-     		"request": function(config) {
-         		// same as above
-         		return config || $q.when(config);
-      		},
- 
-      		"response": function(response) {
-        		// same as above
-        		if (response.status === 401)
-              		$location.url('/login');
-            	return $q.reject(response);
-      		}
-    	};
-  	});
-	*/
 	
 	$httpProvider.responseInterceptors.push(function($q, $location) {
       return function(promise) {
@@ -351,7 +247,6 @@ gpApp.config(function($routeProvider, $locationProvider, $httpProvider){
         );
       }
     });
-	
 });
 
 

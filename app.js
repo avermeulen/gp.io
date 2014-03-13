@@ -5,7 +5,7 @@ var express = require('express'),
     LocalStrategy = require('passport-local').Strategy,
     UserService = require("./user-service"), 
     async = require("async"),
-    url = "mongodb://127.0.0.1:27017/gp_io",
+    url = process.env.GP_IO_MONGO_URL,
     userService = new UserService(url);
     //users = {};
 
@@ -13,16 +13,22 @@ var express = require('express'),
 // Define the strategy to be used by PassportJS
 passport.use(new LocalStrategy(
   function(username, password, done) {
+
+
+
     var status;
     async.waterfall([
       function(callback){
         userService.login({email : username, password: password}, callback, callback);    
       }],
-      function(err, result){
+      function(err, result, user){
+        console.log(arguments);
         if (result === "login_success"){
-          status = done(null, {name: username});
+          status = done(null, {name: username, user_id : user._id});
         }
+        else{
           status = done(null, false, { message: 'Incorrect username.' });
+        }
       });      
       return status
   }
@@ -56,6 +62,7 @@ app.set('port', process.env.PORT || 3000);
 app.use(express.favicon());
 app.use(express.logger('dev'));
 app.use(express.cookieParser()); 
+
 app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(express.session({ secret: 'securedsession' }));
@@ -83,6 +90,12 @@ app.get('/users', auth, function(req, res){
 //==================================================================
 // route to test if the user is logged in or not
 app.get('/loggedin', function(req, res) {
+
+  if (!req.isAuthenticated()){
+    req.logOut();
+    res.clearCookie("user");
+  }
+
   res.send(req.isAuthenticated() ? req.user : '0');
 });
 
@@ -97,21 +110,29 @@ app.post('/login', passport.authenticate('local'),
 
 // route to log in
 app.post('/register', 
-  function(req, res) {
-    
+  function(req, res) { 
     var username = req.body.username,
         password = req.body.password;
 
-    console.log(req.body);
-    console.log(username);
-    console.log(password);
-    
-    users[username] = password;
+    var userDetails = {email : username, password : password};
+    userService.addUser(userDetails, 
+      function(err, status, user){
+        res.send({
+          status : "success",
+          username : username
+        });
+      }, 
+      function(status){
+        res.send({
+          status : status,
+          username : ""
+        });
+      });
+});
 
-    res.send({
-      status : "success",
-      username : username
-    });
+app.post('/prediction', function(req, res){
+  console.log(req.user);
+  console.log(req.body.prediction);
 });
 
 // route to log out
