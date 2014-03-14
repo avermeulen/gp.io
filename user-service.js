@@ -1,6 +1,5 @@
 var MongoClient = require('mongodb').MongoClient;
 
-
 var UserServices = function(mongoUrl){
 	var self = this;
 	self.mongoUrl = mongoUrl;	
@@ -9,7 +8,6 @@ var UserServices = function(mongoUrl){
 UserServices.prototype.mongoClient = function(mongoAction){
 	MongoClient.connect(this.mongoUrl, mongoAction);
 };
-
 
 UserServices.prototype.login = function(loginDetails, success, error){
 	var userLogin = function(err, db){
@@ -31,21 +29,26 @@ UserServices.prototype.login = function(loginDetails, success, error){
 };
 
 UserServices.prototype.addUser = function(user, success, error){
-	var addUser = function(err, db) {
+	var self = this;
+	var findUser = function(err, db) {
 		var users = db.collection("users");
-		users.insert(user, function(err, docs)
-		{
-			if(err){
-				error("error", err);		
-			}
-			else{
-				success(null, "success", user);
-			}
+		users.findOne({email : user.email}, function(err, user){
+			if(err)
+				error(err, "login_error");		
+			else
+				user === null ? self.mongoClient(addUser) : error("username_already_exists");
 			db.close();
 		});
-	};	
-	this.mongoClient(addUser);
+	};
+
+	var addUser = function(err, db) {
+		var users = db.collection("users");
+		users.insert(user, function(err, docs){
+			err ? error("error", err) : success(null, "success", user);
+			db.close();
+		});
+	};
+	this.mongoClient(findUser);
 };
 
 module.exports = UserServices;
-
