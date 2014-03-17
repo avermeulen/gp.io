@@ -4,9 +4,13 @@ var express = require('express'),
     passport = require('passport'),
     LocalStrategy = require('passport-local').Strategy,
     UserService = require("./user-service"), 
+    PredictionService = require("prediction-service"),
+    MongoClient = require("mongo-client"),
     async = require("async"),
     url = process.env.GP_IO_MONGO_URL,
-    userService = new UserService(url);
+    userService = new UserService(url),
+    predictionService = new PredictionService(new MongoClient(url));
+
     //users = {};
 
 //==================================================================
@@ -134,6 +138,27 @@ app.post('/register',
 app.post('/prediction', function(req, res){
   console.log(req.user);
   console.log(req.body.prediction);
+  predictionService.store(req.user, req.body.prediction, function(prediction){
+    console.log("prediction stored : " + prediction);
+  }, 
+  function(err){
+    console.log(err);
+  })
+});
+
+app.get('/prediction/:race_name', function(req, res){
+  console.log(req.user);
+  console.log(req.params.race_name);
+
+  res.send("yeah!");
+  /*
+  predictionService.store(req.user, req.body.prediction, function(prediction){
+    console.log("prediction stored : " + prediction);
+  }, 
+  function(err){
+    console.log(err);
+  })
+*/
 });
 
 // route to log out

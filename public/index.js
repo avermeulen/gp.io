@@ -82,14 +82,12 @@ gpApp.service("mongoDataStore", function($http){
 
 gpApp.service("dataStore", function(mongoDataStore, localStorageDataStore){
 	return mongoDataStore;
-	//return localStorageDataStore;
 });
 
 
 gpApp.service("predictionDataService", function(dataStore){
 
 	var predictionDataService = {}; 
-		//context = {};
 		
 	predictionDataService.races = [
 			//{ id:0, name : "Select race"},
@@ -114,8 +112,7 @@ gpApp.service("predictionDataService", function(dataStore){
 		if (predictionDetails !== undefined && predictionDetails.racePrediction !== undefined){
 			var racePrediction = predictionDetails.racePrediction;
 			racePrediction.user_id = user_id;
-			dataStore.set(racePrediction.name, { prediction : JSON.stringify(racePrediction)});
-			//context[racePrediction.name] = racePrediction;
+			dataStore.set(racePrediction.name, { prediction : angular.toJson(racePrediction)});
 		}
 	};
 
