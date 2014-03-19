@@ -7,19 +7,18 @@ var express = require('express'),
     PredictionService = require("prediction-service"),
     MongoClient = require("mongo-client"),
     async = require("async"),
+    PredictionRoutes = require("./routes/prediction-routes"),
     url = process.env.GP_IO_MONGO_URL,
-    userService = new UserService(url),
-    predictionService = new PredictionService(new MongoClient(url));
-
-    //users = {};
+    mongoClient = new MongoClient(url, ["predictions", "users"]),
+    userService = new UserService(mongoClient),
+    predictionService = new PredictionService(mongoClient),
+    //predictionRoutes = new PredictionRoutes(mongoClient),
+    app = express();
 
 //==================================================================
 // Define the strategy to be used by PassportJS
 passport.use(new LocalStrategy(
   function(username, password, done) {
-
-
-
     var status;
     async.waterfall([
       function(callback){
@@ -57,7 +56,6 @@ var auth = function(req, res, next){
 //==================================================================
 
 // Start express application
-var app = express();
 
 // all environments
 app.set('port', process.env.PORT || 3000);
@@ -71,7 +69,7 @@ app.use(express.cookieParser());
 
 app.use(express.bodyParser());
 app.use(express.methodOverride());
-app.use(express.session({ secret: 'securedsession' }));
+app.use(express.session({ secret: 'die_BlouBulleWetie_vanVerloornie' }));
 app.use(passport.initialize()); // Add passport initialization
 app.use(passport.session());    // Add passport initialization
 app.use(app.router);
@@ -80,17 +78,6 @@ app.use(app.router);
 if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
-
-//==================================================================
-// routes
-app.get('/', function(req, res){
-  res.render('index.html');
-});
-
-app.get('/users', auth, function(req, res){
-  res.send(users);
-});
-//==================================================================
 
 //==================================================================
 // route to test if the user is logged in or not
@@ -107,9 +94,7 @@ app.get('/loggedin', function(req, res) {
 // route to log in
 app.post('/login', passport.authenticate('local'), 
   function(req, res) {
-    
     res.cookie("user", JSON.stringify(req.user));
-
     res.send(req.user);
 });
 
@@ -135,30 +120,30 @@ app.post('/register',
       });
 });
 
-app.post('/prediction', function(req, res){
-  console.log(req.user);
-  console.log(req.body.prediction);
-  predictionService.store(req.user, req.body.prediction, function(prediction){
-    console.log("prediction stored : " + prediction);
-  }, 
-  function(err){
-    console.log(err);
-  })
+app.post('/prediction', auth, function(req, res){
+  predictionService.store(req.user, JSON.parse(req.body.prediction), 
+    function(prediction){
+      res.send({ response : "ok" });
+    }, 
+    function(err){
+      res.send({response : "error", details : err});   
+    })
 });
 
-app.get('/prediction/:race_name', function(req, res){
-  console.log(req.user);
-  console.log(req.params.race_name);
-
-  res.send("yeah!");
-  /*
-  predictionService.store(req.user, req.body.prediction, function(prediction){
-    console.log("prediction stored : " + prediction);
-  }, 
-  function(err){
-    console.log(err);
-  })
-*/
+app.get('/prediction/:race_name', auth, function(req, res){
+  var queryDetails = {
+      user_id : req.user.user_id, 
+      name : req.params.race_name
+    };
+    predictionService.findPrediction(queryDetails, 
+      function(err, prediction){
+        if (err)
+          res.send("no : " + err);
+        else    
+          res.send(prediction);
+      }, 
+      function(err){   
+      });
 });
 
 // route to log out
@@ -168,7 +153,9 @@ app.post('/logout', function(req, res){
   res.send(200);
 });
 //==================================================================
-
-http.createServer(app).listen(app.get('port'), function(){
-  console.log('Express server listening on port ' + app.get('port'));
+mongoClient.connect(function(){
+  http.createServer(app).listen(app.get('port'), function(){
+    console.log('Express server listening on port ' + app.get('port'));
+  });
 });
+

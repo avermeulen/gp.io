@@ -1,16 +1,18 @@
 var assert = require("assert"),
-	MongoClient = require('mongodb').MongoClient,
+	MongoClient = require('../mongo-client'),
 	UserService = require("../user-service")
 	async = require("async");
 
 describe("UserService", function(){
-  var 	url = "mongodb://127.0.0.1:27017/gp_io",
-  		userService = new UserService(url);
+  var url = "mongodb://127.0.0.1:27017/gp_io",
+      mongoClient = new MongoClient(url, ["users"]),
+      userService = null;
 
-  before(function(){
-    MongoClient.connect(url, function(err, db){
-      var  users = db.collection("users");
-		  users.remove({email : "test@email.com"}, function(){});
+  before(function(done){
+    mongoClient.connect(function(){
+      mongoClient.users.remove({email : "test@email.com"}, function(){});
+      userService = new UserService(mongoClient);
+      done();
     });
   });
 
@@ -61,19 +63,4 @@ describe("UserService", function(){
         });
     });
   });
-
-  /*
-  describe("login", function(done){
-    // Add your setup and assertions here
-    userService.login({email : "test@email.com", password : "pass"}, 
-    	function(status){
-   			setTimeout(done, 500);
-    		assert.equal("login_success", status);
-    	},
-    	function(){
-    		assert.ok(1==2)
-    	});
-  });
-*/
-
 });

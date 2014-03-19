@@ -25,8 +25,12 @@ gpApp.controller("PredictionCtrl",
 		if ($scope.selectedRace() === "")
 			return;
 		predictionDataService.storePrediction({racePrediction : $scope.racePrediction});
-		$scope.racePrediction = predictionDataService.findPrediction({raceName : $scope.selectedRace()});
-		predictionManager.manageDriverSelection($scope.drivers, $scope.racePrediction.predictions);
+		 predictionDataService.findPrediction({raceName : $scope.selectedRace()}, function(racePrediction){
+		 	if (racePrediction !== ""){
+		 		$scope.racePrediction = racePrediction;
+				predictionManager.manageDriverSelection($scope.drivers, $scope.racePrediction.predictions);
+			}
+		 });
 	}
 
 	$scope.driverSelectionChanged = function(driver){

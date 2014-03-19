@@ -6,22 +6,27 @@ var PredictionService = require("prediction-service"),
 
 describe("Prediction Service", function () {
 	var url = "mongodb://127.0.0.1:27017/gp_io",
-		mongoClient = new MongoClient(url), 
-		predictionService = new PredictionService(mongoClient);
+		mongoClient = new MongoClient(url, ["predictions"]),
+		predictionService = null;
 
-	before(function(){
-			mongoClient.mongoAction(function(err, db){
-				var predictions = db.collection("predictions");
-				predictions.remove({user_id : "123", name : "Test Race"}, function(){});
-				predictions.remove({user_id : "222", name : "Test Race 222"}, function(){});
-				predictions.insert({user_id : "222", name : "Test Race 222"}, function(){});
-			});
-		});	
+	before(function(done){			
+		mongoClient.connect(function(){
+			console.log("intialized");
+			predictionService = new PredictionService(mongoClient);	
+			var predictions = mongoClient.predictions;
+			predictions.remove({user_id : "123", name : "Test Race"}, function(){});
+			predictions.remove({user_id : "222", name : "Test Race 222"}, function(){});
+			predictions.insert({user_id : "222", name : "Test Race 222"}, function(){});
+			done();
+		});
+	});	
 
 	describe("store", function(){
 	  
 	  it("should save the prediction and find it", function(done){
-	  	predictionService.store({ user_id : "123"}, {name : "Test Race"}
+	  	predictionService.store(
+	  		{user_id : "123"}, 
+	  		{name : "Test Race"}
 	  		,function(){
 	  				predictionService.findPrediction({user_id : "123", name : "Test Race"}, function(err, prediction){
 	    				console.log(arguments)
