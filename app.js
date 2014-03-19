@@ -4,7 +4,7 @@ var express = require('express'),
     passport = require('passport'),
     LocalStrategy = require('passport-local').Strategy,
     UserService = require("./user-service"), 
-    PredictionService = require("prediction-service"),
+    PredictionService = require("./prediction-service"),
     MongoClient = require("mongo-client"),
     async = require("async"),
     PredictionRoutes = require("./routes/prediction-routes"),
@@ -14,7 +14,6 @@ var express = require('express'),
     predictionService = new PredictionService(mongoClient),
     //predictionRoutes = new PredictionRoutes(mongoClient),
     app = express();
-
 //==================================================================
 // Define the strategy to be used by PassportJS
 passport.use(new LocalStrategy(
