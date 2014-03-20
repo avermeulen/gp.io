@@ -41,7 +41,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-md-3" ng-repeat="prediction in racePrediction.predictions" >
+    <div class="col-md-4" ng-repeat="prediction in racePrediction.predictions" >
       <h3>Race prediction</h3>
       <div class="panel panel-default">
           <div class="panel-heading">
@@ -49,19 +49,23 @@
           </div>
           <h4>{{prediction.totalPoints}}</h4>
           <div class="form-group">
-            <div>
-              <div ng-repeat="predictionType in predictionTypes">
-                <button type="button" class="btn btn-primary btn-xs" 
-                    ng-click="increase(prediction, predictionType)">
-                  <span class="glyphicon glyphicon-chevron-up"></span>
-                </button>
-                <span class="badge" >{{prediction.points[predictionType]}}</span>
-                <button type="button" class="btn btn-primary btn-xs" 
-                    ng-click="decrease(prediction, predictionType)">
-                  <span class="glyphicon glyphicon-chevron-down"></span>
-                </button>
-                <strong>{{predictionType}}</strong>
-                
+              <div class="input-group" ng-repeat="predictionType in predictionTypes">            
+                   <span class="input-group-btn">
+                     <button class="btn btn-success" type="button" ng-click="increase(prediction, predictionType)">
+                        <span class="glyphicon glyphicon-plus"></span>
+                     </button>
+                   </span>
+                   <span class="input-group-addon">
+                    {{predictionType | uppercase}}
+                   </span>
+                   <input  class="form-control" type="text" disabled value="{{prediction.points[predictionType]}}" > 
+                   <span class="input-group-btn"> 
+                     <button class="btn btn-danger" type="button" ng-click="decrease(prediction, predictionType)">
+                       <span class="glyphicon glyphicon-minus"></span>
+                     </button>     
+                    </span>
+                    <p>
+                    </p>         
               </div>
             </div>
           </div>
