@@ -46,6 +46,22 @@ gpApp.controller("PredictionCtrl",
 		return predictionManager.groupPointsByType($scope.racePrediction);
 	};
 
+	$scope.pointWarnings = function(){
+		var warnings = [];
+		var pointsPerCategory = $scope.pointsPerCategory();
+		if ($scope.totalPoints() >= 5){
+			if (pointsPerCategory['retire'] < 2)
+				warnings.push("Add at least 2 retirement predictions");
+			if (pointsPerCategory['podium'] < 2)
+				warnings.push("Add at least 2 podium predictions");
+			if (pointsPerCategory['grid'] < 2)
+				warnings.push("Add at least 2 grid predictions");
+			if (!$scope.maxPointsUsed())
+				warnings.push("Not all points have been used yet.");
+		}
+		return warnings;
+	}
+
 	$scope.increase = function(prediction, field){
 		if ($scope.maxPointsUsed())
 			return;

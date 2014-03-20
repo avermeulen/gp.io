@@ -17,6 +17,32 @@
           Grid: <span class="label label-warning">{{pointsPerCategory()['grid']}}</span>  
           Retire: <span class="label label-danger">{{pointsPerCategory()['retire']}}</span>
           Podium: <span class="label label-success">{{pointsPerCategory()['podium']}}</span>
+        </div>  
+        <div class="well">
+          <h4>Prediction type</h4>
+          <div class="radio">
+            <label>
+              <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+              Both ways
+            </label>
+          </div>
+          <div class="radio">
+            <label>
+              <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+              Win only
+            </label>
+          </div>
+          <span class="help-block">All or nothing. Win big or go home.</span>
+
+          <h4>Banker</h4>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" value="">
+                Play a banker (2 available)
+              </label>
+              <span class="help-block">Playing a banker doubles your score for a round.</span>
+
+          </div>
         </div>
         <div ng-hide="driverSelectionVisible || racePrediction.submitted">
           <input class="btn btn-primary btn-block active" ng-click="showOrHideDriverSelection(true)" value="Manage drivers">
@@ -41,13 +67,23 @@
     </div>
   </div>
   <div class="row">
+
+  <div class="alert alert-danger" ng-hide="pointWarnings().length === 0" >
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <strong>Warning!</strong>
+    <ul>
+      <li ng-repeat="warning in pointWarnings()">{{warning}}</li>
+    </ul>  
+
+  </div>
+
     <div class="col-md-4" ng-repeat="prediction in racePrediction.predictions" >
       <h3>Race prediction</h3>
       <div class="panel panel-default">
           <div class="panel-heading">
             {{prediction.driverName}}
           </div>
-          <h4>{{prediction.totalPoints}}</h4>
+          <h4>Total : {{prediction.totalPoints}}</h4>
           <div class="form-group">
               <div class="input-group" ng-repeat="predictionType in predictionTypes">            
                    <span class="input-group-btn">
