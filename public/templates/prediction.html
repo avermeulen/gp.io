@@ -111,7 +111,7 @@
   <div class="row">
     <div class="col-md-3">
       <input type="button" value="Submit" class="btn btn-success btn-lg" 
-      ng-show="maxPointsUsed() && racePrediction.submitted !== true" 
+      ng-show="canBeSubmitted() && racePrediction.submitted !== true" 
       ng-click="submitPrediction()">
       <input type="button" value="Unsubmit" class="btn btn-warning btn-lg" 
       ng-show="racePrediction.submitted === true" 

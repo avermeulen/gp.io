@@ -62,6 +62,11 @@ gpApp.controller("PredictionCtrl",
 		return warnings;
 	}
 
+	$scope.canBeSubmitted = function(){
+		return ($scope.pointWarnings().length === 0)
+			&& $scope.maxPointsUsed();
+	}
+
 	$scope.increase = function(prediction, field){
 		if ($scope.maxPointsUsed())
 			return;
