@@ -3,13 +3,13 @@ gpApp.service("predictionManager", function(){
 
 	predictionManager.selectDriver = function(driver, predictions){
 		var findDriver = function(prediction) { 
-			return prediction.driverName === driver.name
+			return prediction.driverName === driver.driverName
 		};
 
 		var existPredictionEntry = _.find(predictions, findDriver);
 		if (driver.selected === "true" && existPredictionEntry === undefined){
 			var predictionEntry = {
-				driverName: driver.name, 
+				driverName: driver.driverName, 
 				points : {grid : 0, podium : 0, retire: 0}, 
 				selected: false, totalPoints:0
 			};
@@ -23,7 +23,7 @@ gpApp.service("predictionManager", function(){
 	predictionManager.manageDriverSelection = function(drivers, predictions){
 		var selectedDrivers = _.pluck(predictions, "driverName");
 		_.each(drivers, function(driver){	
-			driver.selected = _.contains(selectedDrivers, driver.name) ? "true" : "false";
+			driver.selected = _.contains(selectedDrivers, driver.driverName) ? "true" : "false";
 		});
 	}
 
@@ -44,9 +44,9 @@ gpApp.service("predictionManager", function(){
 			}, empty);
 	}
 
-	
 
-	
+
+
 	predictionManager.totalPoints = function(racePrediction){
 
 		if (racePrediction === undefined)
