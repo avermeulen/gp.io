@@ -17,8 +17,12 @@
           Grid: <span class="label label-warning">{{pointsPerCategory()['grid']}}</span>  
           Retire: <span class="label label-danger">{{pointsPerCategory()['retire']}}</span>
           Podium: <span class="label label-success">{{pointsPerCategory()['podium']}}</span>
+        </div>
+        <div ng-hide="managePredictionVisible">
+          <input class="btn btn-primary btn-block active" ng-click="showOrHideManagePrediction(true)" value="Manage Prediction">
+          <p></p>
         </div>  
-        <div class="well">
+        <div ng-show="managePredictionVisible" class="well">
           <h4>Prediction type</h4>
           <div class="radio">
             <label>
@@ -41,7 +45,10 @@
                 Play a banker (2 available)
               </label>
               <span class="help-block">Playing a banker doubles your score for a round.</span>
-
+          </div>
+          <div>
+            <input type="button" class="btn btn-primary btn-block" ng-click="showOrHideManagePrediction(false)" 
+              value="Hide Prediction management">
           </div>
         </div>
         <div ng-hide="driverSelectionVisible || racePrediction.submitted">

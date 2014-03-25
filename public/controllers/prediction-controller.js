@@ -3,6 +3,7 @@ gpApp.controller("PredictionCtrl",
 	$scope.races = predictionDataService.races;
 	$scope.drivers = predictionDataService.drivers;
 	$scope.driverSelectionVisible = false;
+	$scope.managePredictionVisible = false;
 	$scope.predictionTypes = ["grid", "retire", "podium"];
 
 	$scope.maxPointsUsed = function(){
@@ -19,6 +20,10 @@ gpApp.controller("PredictionCtrl",
 
 	$scope.showOrHideDriverSelection = function(showOrHide){
 		$scope.driverSelectionVisible = showOrHide;
+	}
+
+	$scope.showOrHideManagePrediction = function(showOrHide){
+		$scope.managePredictionVisible = showOrHide;
 	}
 
 	$scope.changeRaceSelection = function(){
