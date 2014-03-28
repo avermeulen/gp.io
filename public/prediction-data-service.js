@@ -57,6 +57,8 @@ gpApp.service("predictionDataService", function(dataStore){
 			if (!results){
 				resultCallback({
 					name : predictionDetails.raceName,
+					banker : false,
+					predictionType : "bothWays",
 					predictions : []
 				});
 			}

@@ -26,23 +26,25 @@
           <h4>Prediction type</h4>
           <div class="radio">
             <label>
-              <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+              <input type="radio" name="optionsRadios" id="optionsRadios1" ng-model="racePrediction.predictionType" 
+              value="BothWays" checked>
               Both ways
             </label>
           </div>
           <div class="radio">
             <label>
-              <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+              <input type="radio" name="optionsRadios" id="optionsRadios2" ng-model="racePrediction.predictionType" 
+              value="WinOnly">
               Win only
             </label>
           </div>
-          <span class="help-block">All or nothing. Win big or go home.</span>
+          <span class="help-block">All or nothing for Podium prediction. Win big or go home. </span>
 
           <h4>Banker</h4>
           <div class="checkbox">
             <label>
-              <input type="checkbox" value="">
-                Play a banker (2 available)
+              <input type="checkbox" ng-model="racePrediction.banker" ng-true-value="true" ng-false-value="false">
+                Play a banker (3 available)
               </label>
               <span class="help-block">Playing a banker doubles your score for a round.</span>
           </div>
