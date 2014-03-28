@@ -7,7 +7,6 @@
 	    	<h3>Register as a user</h3>
 	  	</div>
 
-
 	  	<form name="registerForm">
 		  	<div class="alert alert-danger" ng-show=" !registerForm.$pristine && !registerForm.$valid">
 	  			<ul>
@@ -31,6 +30,13 @@
 		    	<input type="password" ng-minlength="6" class="error form-control" name="passwordConfirm" placeholder="Confirm password" 
 		    		required ng-model="confirmPassword">
 		  	</div>
+
+		  	<div class="form-group col-xs-12">
+		    	<label for="exampleInputEmail1">Select your favourite team</label>
+		    		<select class="form-control" ng-model="team" ng-options="team.name for team in teams">
+      			</select>
+		  	</div>
+
 		  	<div class="form-group">
 		    	<input type="button" class="btn btn-success btn" value="Register" ng-click="register()" 
 		    		ng-disabled="!registerForm.$valid" >

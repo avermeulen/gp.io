@@ -11,7 +11,7 @@ var gpApp = angular.module("gpApp", ["ngRoute", "ngCookies"])
     	$rootScope.loggedInUser = function($session){
     		var user = $cookieStore.get("user");
     		if (user !== undefined)
-    			return user.name + " " + user.user_id;
+    			return user.name;
     	}
 
     	$rootScope.loggedIn = function($session){
@@ -86,13 +86,17 @@ gpApp.config(function($routeProvider, $locationProvider, $httpProvider){
 		templateUrl : "templates/login.html",
 		controller : "LoginCtrl"
 	});
+	$routeProvider.when("/about", 
+	{
+		templateUrl : "templates/about.html",
+		controller : "LoginCtrl"
+	});
 	$routeProvider.when("/predictions", 
 	{
 		templateUrl : "templates/prediction.html",
 		controller : "PredictionCtrl",
 		resolve : {
 			loggedin : function($q, $timeout, $http, $location, $rootScope){
-
 				var deferred = $q.defer();
 				$http.get("/loggedin")
 					.success(function(user){

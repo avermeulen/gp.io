@@ -44,9 +44,6 @@ gpApp.service("predictionManager", function(){
 			}, empty);
 	}
 
-
-
-
 	predictionManager.totalPoints = function(racePrediction){
 
 		if (racePrediction === undefined)
@@ -56,7 +53,6 @@ gpApp.service("predictionManager", function(){
 				return t + pred.totalPoints
 			}, 0);
 		return total !== undefined ? total : 0;
-
 	}
 
 	return predictionManager;

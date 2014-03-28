@@ -100,9 +100,10 @@ app.post('/login', passport.authenticate('local'),
 app.post('/register', 
   function(req, res) { 
     var username = req.body.username,
-        password = req.body.password;
+        password = req.body.password,
+        team = req.body.team;
 
-    var userDetails = {email : username, password : password};
+    var userDetails = {email : username, password : password, team: team};
     userService.addUser(userDetails, 
       function(err, status, user){
         res.send({

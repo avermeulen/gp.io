@@ -1,5 +1,5 @@
 gpApp.controller("PredictionCtrl", 
-  function StoryCtrl($scope, $location, $http, predictionDataService, predictionManager){
+  function ($scope, $location, $http, predictionDataService, predictionManager){
 	$scope.races = predictionDataService.races;
 	$scope.drivers = predictionDataService.drivers;
 	$scope.driverSelectionVisible = false;
@@ -9,6 +9,8 @@ gpApp.controller("PredictionCtrl",
 	$scope.maxPointsUsed = function(){
 		return $scope.totalPoints() === 10;
 	}
+
+	$scope.teams = predictionDataService.teams;
 
 	$scope.selectedRace = function(){
 		if ($scope.selectedRaceId === undefined)
@@ -62,7 +64,7 @@ gpApp.controller("PredictionCtrl",
 			if (pointsPerCategory['grid'] < 2)
 				warnings.push("Add at least 2 grid predictions");
 			if (!$scope.maxPointsUsed())
-				warnings.push("Not all points have been used yet.");
+				warnings.push("Not all 10 points have been used yet. Submit button won't be available.");
 		}
 		return warnings;
 	}

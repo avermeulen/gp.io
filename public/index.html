@@ -32,14 +32,15 @@
             <li><a href="#/predictions" ng-show="loggedIn()">Predictions</a></li>
             <li><a href="#profile" ng-show="loggedIn()">Profile</a></li>
             <li><a href="#/login" ng-hide="loggedIn()">Login</a></li>
-            <li><a href="#about">About</a></li>
+            <li><a href="#/about">About</a></li>
             <li><a href="#/" ng-click="logout()" ng-show="loggedIn()">Logout</a></li>
+            <li><a href="#/">{{loggedInUser()}}</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>  
      </nav>
      <div class="container">
-        {{loggedInUser()}}
+        
         <ng-view>
         </ng-view>   
      </div>

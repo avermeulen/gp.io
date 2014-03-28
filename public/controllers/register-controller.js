@@ -1,15 +1,16 @@
-
-
-gpApp.controller("RegisterCtrl", function($scope, $rootScope, $http, $location){
+gpApp.controller("RegisterCtrl", function($scope, $rootScope, $http, $location, predictionDataService){
 	"use strict";
 
 	$scope.user = {};
+
+	$scope.teams = predictionDataService.teams;
 
 	$scope.register = function(){
 
 		var loginDetails = {
 			username : $scope.username,
-			password : $scope.password
+			password : $scope.confirmPassword,
+			team : $scope.team.name
 		};
 
 		$http.post("/register", loginDetails).success(function(result){
