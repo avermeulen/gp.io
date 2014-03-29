@@ -90,9 +90,11 @@ gpApp.controller("PredictionCtrl",
 
 	$scope.submitPrediction = function(prediction){
 		$scope.racePrediction.submitted = true;
-	}
+		predictionDataService.storePrediction({racePrediction : $scope.racePrediction});
+	};
 
 	$scope.reopenPrediction = function(prediction){
 		$scope.racePrediction.submitted = false;
-	}
+		predictionDataService.storePrediction({racePrediction : $scope.racePrediction});
+	};
 });
