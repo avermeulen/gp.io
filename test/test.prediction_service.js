@@ -9,9 +9,9 @@ describe("Prediction Service", function () {
 		mongoClient = new MongoClient(url, ["predictions"]),
 		predictionService = null;
 
-	before(function(done){			
+	beforeEach(function(done){			
 		mongoClient.connect(function(){
-			console.log("intialized");
+			console.log("initialized");
 			predictionService = new PredictionService(mongoClient);	
 			var predictions = mongoClient.predictions;
 			predictions.remove({user_id : "123", name : "Test Race"}, function(){});

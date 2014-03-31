@@ -8,7 +8,7 @@ describe("UserService", function(){
       mongoClient = new MongoClient(url, ["users"]),
       userService = null;
 
-  before(function(done){
+  beforeEach(function(done){
     mongoClient.connect(function(){
       mongoClient.users.remove({email : "test@email.com"}, function(){});
       userService = new UserService(mongoClient);
@@ -34,6 +34,53 @@ describe("UserService", function(){
         function(err, result){
             assert.equal(err, null, err);
 
+            assert.equal("login_success", result);
+            done();
+        });
+    });
+  });
+
+  describe("addUser and Login with uppercase user name", function(){
+    it("should create user", function(done){
+        var userDetails = {email : "test@email.com", password : "pass"};
+        async.waterfall([
+          function(callback){
+              userService.addUser(userDetails, 
+                 callback,
+                 callback);
+            },
+            function(status, user, callback){
+              userService.login({ email : "Test@email.com", password : "pass" }, 
+                callback, 
+                callback);
+            },
+        ],
+        function(err, result){
+            assert.equal(err, null, err);
+
+            assert.equal("login_success", result);
+            done();
+        });
+    });
+  });
+
+  describe("addUser with uppercase test and Login with lower user name", function(){
+    it("should create user", function(done){
+        var userDetails = {email : "TEST@email.com", password : "pass"};
+        async.waterfall([
+          function(callback){
+              userService.addUser(userDetails, 
+                 callback,
+                 callback);
+            },
+            function(status, user, callback){
+              userService.login({ email : "test@email.com", password : "pass" }, 
+                callback, 
+                callback);
+            },
+        ],
+        function(err, result){
+            assert.equal(err, null, err);
             assert.equal("login_success", result);
             done();
         });
