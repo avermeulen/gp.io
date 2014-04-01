@@ -24,7 +24,7 @@ UserServices.prototype.login = function(loginDetails, success, error){
 UserServices.prototype.addUser = function(user, success, error){
 	var self = this;
 	var users = this.mongoClient.users;
-	
+
 	user.email = user.email.toLowerCase();
 	
 	var addUser = function(){
@@ -40,5 +40,14 @@ UserServices.prototype.addUser = function(user, success, error){
 			user === null ? addUser() : error("username_already_exists");
 	});
 };
+
+UserServices.prototype.allUsers = function(callback){
+	var users = this.mongoClient.users;
+
+	var usernames = users.find({}, {email:1}).toArray(function(err, users){
+		callback(null, users);
+	});
+
+}
 
 module.exports = UserServices;

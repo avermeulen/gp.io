@@ -155,13 +155,22 @@ app.get("/predictions/:race_name", auth, function(req, res){
       res.send([]);
     }
     else{
-      console.log(predictions)    
       res.send(predictions);
     }
   });
+});
 
+app.get("/users", auth, function(req, res){
+  userService.allUsers(function(err, users){
+    if (err){
+      res.send([]);
+    }
+    else{
+      res.send(users);
+    }
+  });
+});
 
-})
 
 
 // route to log out
