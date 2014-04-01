@@ -91,25 +91,45 @@ gpApp.config(function($routeProvider, $locationProvider, $httpProvider){
 		templateUrl : "templates/about.html",
 		controller : "LoginCtrl"
 	});
+	
+	var loggedIn = function($q, $timeout, $http, $location, $rootScope){
+		var deferred = $q.defer();
+		$http.get("/loggedin").success(function(user){
+				if(user !== "0")
+					$timeout(deferred.resolve, 0);
+				else {
+					$rootScope.message = 'You need to log in.';
+  					$timeout(function(){deferred.reject();}, 0);
+  					$location.url('/login');			
+				}
+		});
+		return deferred.promise;
+	};
+
 	$routeProvider.when("/predictions", 
 	{
 		templateUrl : "templates/prediction.html",
 		controller : "PredictionCtrl",
 		resolve : {
-			loggedin : function($q, $timeout, $http, $location, $rootScope){
-				var deferred = $q.defer();
-				$http.get("/loggedin")
-					.success(function(user){
-						if(user !== "0")
-							$timeout(deferred.resolve, 0);
-						else {
-							$rootScope.message = 'You need to log in.';
-          					$timeout(function(){deferred.reject();}, 0);
-          					$location.url('/login');			
-						}
-					});
-				return deferred.promise;
-			}
+			loggedin : loggedIn
+		}
+	});
+
+	$routeProvider.when("/prediction-summary", 
+	{
+		templateUrl : "templates/prediction-summary.html",
+		controller : "PredictionSummaryCtrl",
+		resolve : {
+			loggedin : loggedIn
+		}
+	});
+
+	$routeProvider.when("/scoreboard", 
+	{
+		templateUrl : "templates/scoreboard.html",
+		controller : "PredictionSummaryCtrl",
+		resolve : {
+			loggedin : loggedIn
 		}
 	});
 	

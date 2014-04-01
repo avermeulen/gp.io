@@ -1,7 +1,8 @@
 <div class="container" ng-cloak>
   <div class="row">
     <div class="col-md-4">
-      <h1>Select race</h1>
+      <h1>My predictions</h1>
+      <h2>Select a race</h2>
       <select class="form-control" ng-model="selectedRaceId" 
           ng-init="foo = foo || races[0]" ng-options="race.id as race.name for race in races"
           ng-change="changeRaceSelection()">

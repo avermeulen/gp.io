@@ -1,5 +1,6 @@
-var MongoDB = require('mongodb').MongoClient;
-var mongoDB;
+var MongoDB = require('mongodb').MongoClient,
+	ObjectID = require('mongodb').ObjectID,
+	mongoDB;
 
 var MongoClient = function(mongoUrl, collections){
 	if (!mongoUrl)
@@ -19,6 +20,10 @@ MongoClient.prototype.connect = function(connectedCallback){
 
 MongoClient.prototype.collection = function(collection){
 	return mongoDB.collection(collection);
+};
+
+MongoClient.prototype.Id = function(id) {
+	return new ObjectID(id);
 };
 
 var setupCollections = function(db){

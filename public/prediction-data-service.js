@@ -1,4 +1,4 @@
-gpApp.service("predictionDataService", function(dataStore){
+gpApp.service("predictionDataService", function(dataStore, $http){
 
 	var predictionDataService = {}; 
 		
@@ -92,6 +92,11 @@ gpApp.service("predictionDataService", function(dataStore){
 		};
 		dataStore.get(predictionDetails.raceName, callback);
 	};
+
+	predictionDataService.racePredictions = function(raceName, callback){
+		$http.get("/predictions/" + raceName).success(callback);
+	};
+
 
 	return predictionDataService;
 });

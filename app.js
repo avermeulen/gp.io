@@ -130,7 +130,7 @@ app.post('/prediction', auth, function(req, res){
 });
 
 app.get('/prediction/:race_name', auth, function(req, res){
-  var queryDetails = {
+    var queryDetails = {
       user_id : req.user.user_id, 
       name : req.params.race_name
     };
@@ -144,6 +144,25 @@ app.get('/prediction/:race_name', auth, function(req, res){
       function(err){   
       });
 });
+
+app.get("/predictions/:race_name", auth, function(req, res){
+  var queryDetails = {
+      name : req.params.race_name
+    };
+
+  predictionService.findRacePredictions(queryDetails, function(err, predictions){
+    if (err){
+      res.send([]);
+    }
+    else{
+      console.log(predictions)    
+      res.send(predictions);
+    }
+  });
+
+
+})
+
 
 // route to log out
 app.post('/logout', function(req, res){

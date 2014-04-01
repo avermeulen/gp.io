@@ -29,7 +29,9 @@
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
             <li class="active"><a href="#">Home</a></li>
-            <li><a href="#/predictions" ng-show="loggedIn()">Predictions</a></li>
+            <li><a href="#/predictions" ng-show="loggedIn()">My Predictions</a></li>
+            <li><a href="#/prediction-summary" ng-show="loggedIn()">Predictions</a></li>
+            <li><a href="#/scoreboard" ng-show="loggedIn()">Scoreboard</a></li>
             <li><a href="#profile" ng-show="loggedIn()">Profile</a></li>
             <li><a href="#/login" ng-hide="loggedIn()">Login</a></li>
             <li><a href="#/about">About</a></li>
@@ -55,6 +57,7 @@
     <script src="index.js"></script>
     <script src="prediction-manager.js"></script>
     <script src="prediction-data-service.js"></script>
+    <script src="controllers/prediction-summary-controller.js"></script>
     <script src="controllers/register-controller.js"></script>
     <script src="controllers/login-controller.js"></script>
     <script src="controllers/prediction-controller.js"></script>

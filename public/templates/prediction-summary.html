@@ -1,0 +1,29 @@
+<div class="row">
+	<h1>Race prediction summary</h1>
+	<div class="col-md-4">
+		<h2>Select a race</h2>
+	    <select class="form-control" ng-model="selectedRace" 
+	           ng-options="race.name for race in races"
+	          ng-change="raceSelectionChanged()">
+	    </select>
+	</div>
+</div>
+<div class="row">
+	<div ng-repeat="racePrediction in racePredictions">
+      <h3>{{racePrediction.user_name}}</h3>
+      <table class="table table-condensed table-striped">
+      	<tr>
+      		<th>Driver</th>
+      		<th>Grid</th>
+      		<th>Retire</th>
+      		<th>Podium</th>
+      	</tr>
+      	<tr ng-repeat="prediction in racePrediction.predictions">
+      			<td>{{prediction.driverName}}</td>
+      			<td>{{prediction.points.grid}}</td>
+      			<td>{{prediction.points.retire}}</td>
+      			<td>{{prediction.points.podium}}</td>
+      	</tr>
+      </table>
+    </div>
+</div>
