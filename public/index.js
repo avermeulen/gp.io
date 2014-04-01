@@ -127,7 +127,7 @@ gpApp.config(function($routeProvider, $locationProvider, $httpProvider){
 	$routeProvider.when("/scoreboard", 
 	{
 		templateUrl : "templates/scoreboard.html",
-		controller : "PredictionSummaryCtrl",
+		controller : "ScoreboardCtrl",
 		resolve : {
 			loggedin : loggedIn
 		}
