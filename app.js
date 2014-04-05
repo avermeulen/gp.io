@@ -67,7 +67,11 @@ app.use(express.cookieParser());
 
 app.use(express.bodyParser());
 app.use(express.methodOverride());
-app.use(express.session({ secret: 'die_BlouBulleWetie_vanVerloornie' }));
+app.use(express.session({ 
+    secret: 'die_BlouBulleWetie_vanVerloornie',
+    cookie: { maxAge : 1800000 } // time out after 30 minutes
+  }
+));
 app.use(passport.initialize()); // Add passport initialization
 app.use(passport.session());    // Add passport initialization
 app.use(app.router);
