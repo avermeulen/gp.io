@@ -28,10 +28,10 @@ gpApp.service("predictionManager", function(){
 	}
 
 	predictionManager.groupPointsByType = function(racePrediction){
-		var empty = {grid : 0, podium : 0, retire: 0};
+		var emptyPoints = {grid : 0, podium : 0, retire: 0};
 
 		if (racePrediction === undefined)
-			return empty;
+			return emptyPoints;
 
 		return _.reduce(
 			racePrediction.predictions, 
@@ -41,7 +41,7 @@ gpApp.service("predictionManager", function(){
 				initialPoints.retire += points.retire ? points.retire : 0;
 				initialPoints.podium += points.podium ? points.podium : 0;
 				return initialPoints;
-			}, empty);
+			}, emptyPoints);
 	}
 
 	predictionManager.totalPoints = function(racePrediction){

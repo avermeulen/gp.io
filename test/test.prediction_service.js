@@ -1,7 +1,7 @@
 "use strict";
 
-var PredictionService = require("prediction-service"),
-	MongoClient = require("mongo-client"),
+var PredictionService = require("../prediction-service"),
+	MongoClient = require("../mongo-client"),
 	assert = require("assert");
 
 describe("Prediction Service", function () {

@@ -1,6 +1,7 @@
 var gpApp = angular.module("gpApp", ["ngRoute", "ngCookies"])
 	.run(function($rootScope, $http, $cookieStore){
 		$rootScope.message = '';
+		$rootScope.isLoggedIn = "false";
 
     	// Logout function is available in any pages
     	$rootScope.logout = function(){
@@ -10,8 +11,9 @@ var gpApp = angular.module("gpApp", ["ngRoute", "ngCookies"])
 
     	$rootScope.loggedInUser = function($session){
     		var user = $cookieStore.get("user");
-    		if (user !== undefined)
+    		if (user !== undefined){
     			return user.name;
+    		}
     	}
 
     	$rootScope.loggedIn = function($session){
@@ -76,6 +78,24 @@ gpApp.service("dataStore", function(mongoDataStore, localStorageDataStore){
 });
 
 gpApp.config(function($routeProvider, $locationProvider, $httpProvider){
+
+	var checkThatUserIsLoggedIn = function($q, $timeout, $http, $location){
+		var deferred = $q.defer();
+		$http.get("/loggedin").success(function(user){
+				if(user !== "0"){
+					$timeout(deferred.resolve, 0);
+					//$rootScope.isLoggedIn = "true";
+				}
+				else {
+					//$rootScope.message = 'You need to log in.';
+					//$rootScope.isLoggedIn = "false";
+  					$timeout(function(){deferred.reject();}, 0);
+  					$location.url('/login');			
+				}
+		});
+		return deferred.promise;
+	};
+
 	$routeProvider.when("/register", 
 	{
 		templateUrl : "templates/register.html",
@@ -86,32 +106,29 @@ gpApp.config(function($routeProvider, $locationProvider, $httpProvider){
 		templateUrl : "templates/login.html",
 		controller : "LoginCtrl"
 	});
+
+	$routeProvider.when("/login-check", 
+	{
+		templateUrl : "templates/login.html",
+		controller : "LoginCtrl",
+		resolve : {
+			loggedin : checkThatUserIsLoggedIn
+		}
+	});
+
 	$routeProvider.when("/about", 
 	{
 		templateUrl : "templates/about.html",
 		controller : "LoginCtrl"
 	});
 	
-	var loggedIn = function($q, $timeout, $http, $location, $rootScope){
-		var deferred = $q.defer();
-		$http.get("/loggedin").success(function(user){
-				if(user !== "0")
-					$timeout(deferred.resolve, 0);
-				else {
-					$rootScope.message = 'You need to log in.';
-  					$timeout(function(){deferred.reject();}, 0);
-  					$location.url('/login');			
-				}
-		});
-		return deferred.promise;
-	};
 
 	$routeProvider.when("/predictions", 
 	{
 		templateUrl : "templates/prediction.html",
 		controller : "PredictionCtrl",
 		resolve : {
-			loggedin : loggedIn
+			loggedin : checkThatUserIsLoggedIn
 		}
 	});
 
@@ -120,7 +137,7 @@ gpApp.config(function($routeProvider, $locationProvider, $httpProvider){
 		templateUrl : "templates/prediction-summary.html",
 		controller : "PredictionSummaryCtrl",
 		resolve : {
-			loggedin : loggedIn
+			loggedin : checkThatUserIsLoggedIn
 		}
 	});
 
@@ -129,11 +146,21 @@ gpApp.config(function($routeProvider, $locationProvider, $httpProvider){
 		templateUrl : "templates/scoreboard.html",
 		controller : "ScoreboardCtrl",
 		resolve : {
-			loggedin : loggedIn
+			loggedin : checkThatUserIsLoggedIn
 		}
 	});
 	
+	$routeProvider.when("/race-results", 
+	{
+		templateUrl : "templates/race-results.html",
+		controller : "RaceResultsCtrl",
+		resolve : {
+			loggedin : checkThatUserIsLoggedIn
+		}
+	});
+
 	$httpProvider.responseInterceptors.push(function($q, $location) {
+		var slef = this;
       return function(promise) {
         return promise.then(
           // Success: just return the response
@@ -142,8 +169,9 @@ gpApp.config(function($routeProvider, $locationProvider, $httpProvider){
           }, 
           // Error: check the error status to get only the 401
           function(response) {
-            if (response.status === 401)
-              $location.url('/login');
+            if (response.status === 401){
+              	$location.url('/login-check');
+          	}
             return $q.reject(response);
           }
         );

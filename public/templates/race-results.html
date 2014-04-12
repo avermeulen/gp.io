@@ -1,0 +1,141 @@
+<h1>Race results</h1>
+
+
+<div class="row">
+	<div class="col-sm-4">
+		<h2>Select a race</h2>	
+	</div>
+</div>
+<div class="row">
+	<div class="col-sm-4">
+
+		<select class="form-control" ng-model="selectedRace" 
+	                  ng-options="race.name for race in races"
+	                  ng-change="raceSelectionChanged()">
+		</select>
+	</div>
+</div>
+
+<div class="row" >
+	<h3>Grid</h3>
+	<div class="col-sm-4">
+	    <div class="form-group">
+	    	<label class="col-sm-4 control-label">Grid 1</label>
+	    	<div class="col-sm-8">
+		    	<select class="form-control" 
+		    			ng-model="grid1" ng-hide="grid1" 
+		    			ng-options="driver.driverName for driver in driversAvaialbleForGrid()">
+		    	</select>
+		      	<p class="form-control-static" ng-show="grid1" >{{grid1.driverName}} 
+		      		<a href="" class="btn btn-warning btn-sm" ng-click="clear('grid1')" >X</a>
+		      	</p>
+		    </div>
+	  	</div>
+  	</div>	
+
+  	<div class="col-sm-4">
+	    <div class="form-group">
+	    	<label class="col-sm-4 control-label">Grid 2</label>
+	    	<div class="col-sm-8">
+		    	<select class="form-control" 
+		    			ng-model="grid2" ng-hide="grid2" 
+		    			ng-options="driver.driverName for driver in driversAvaialbleForGrid()">
+		    	</select>
+		      	<p class="form-control-static" ng-show="grid2" >{{grid2.driverName}} 
+		      		<a href="" class="btn btn-warning btn-sm" ng-click="clear('grid2')" >X</a>
+		      	</p>
+		    </div>
+	  	</div>
+  	</div>
+</div>
+   
+<div class="row">
+	<h3>Podium</h3>
+	<div class="col-sm-4">
+	    <div class="form-group">
+	    	<label class="col-sm-4 control-label">Podium 1</label>
+	    	<div class="col-sm-8">
+		    	<select class="form-control" 
+		    			ng-model="podium1" ng-hide="podium1" 
+		    			ng-options="driver.driverName for driver in driversAvaialbleForPodium()">
+		    	</select>
+		      	<p class="form-control-static" ng-show="podium1" >{{podium1.driverName}} 
+		      		<a href="" class="btn btn-warning btn-sm" ng-click="clear('podium1')" >X</a>
+		      	</p>
+		    </div>
+	  	</div>
+  	</div>
+    <div class="col-sm-4">
+	    <div class="form-group">
+	    	<label class="col-sm-4 control-label">Podium 2</label>
+	    	<div class="col-sm-8">
+		    	<select class="form-control" 
+		    			ng-model="podium2" ng-hide="podium2" 
+		    			ng-options="driver.driverName for driver in driversAvaialbleForPodium()">
+		    	</select>
+		      	<p class="form-control-static" ng-show="podium2" >{{podium2.driverName}} 
+		      		<a href="" class="btn btn-warning btn-sm" ng-click="clear('podium2')" >X</a>
+		      	</p>
+		    </div>
+	  	</div>
+  	</div>
+
+  	<div class="col-sm-4">
+	    <div class="form-group">
+	    	<label class="col-sm-4 control-label">Podium 3</label>
+	    	<div class="col-sm-8">
+		    	<select class="form-control" 
+		    			ng-model="podium3" ng-hide="podium3" 
+		    			ng-options="driver.driverName for driver in driversAvaialbleForPodium()">
+		    	</select>
+		      	<p class="form-control-static" ng-show="podium3" >{{podium3.driverName}} 
+		      		<a href="" class="btn btn-warning btn-sm" ng-click="clear('podium3')" >X</a>
+		      	</p>
+		    </div>
+	  	</div>
+  	</div>
+</div>
+   <div class="row">
+    <h3>Retire</h3> 
+    	<div class="col-sm-4">
+	    	<div class="form-group">
+	    		<label class="col-sm-4 control-label">Retired</label>
+		    	<div class="col-sm-6">
+			    	<select class="form-control" ng-model="retired" ng-options="driver.driverName for driver in driversThatCanRetired()">
+	    			</select>
+			    </div>
+			    <div class="col-sm-2">
+			    	<input value="Add retired driver" class="btn btn btn-danger btn-sm" type="button" ng-click="retire(retired)">
+			    </div>
+		  	</div>
+  	</div>
+  </div>
+
+   <div class="row">
+     <h3>Retired</h3>
+     <ul>
+       <li ng-repeat="driver in retiredDrivers">
+         {{driver.driverName}}
+         <a href="" class="btn btn-warning btn-sm" ng-click="unretire(driver)">X</a> 
+       </li>
+     </ul>  
+   </div>
+   <div>
+   	<h3>Overview</h3>
+   	{
+   		race : "{{selectedRace}}"
+		grid : {
+			first : "{{grid1.driverName}}",
+			second : "{{grid2.driverName}}"
+		},
+		podium : {
+			first : "{{podium1.driverName}}",
+			second : "{{podium2.driverName}}",
+			third : "{{podium3.driverName}}""
+		},
+		retirees : [
+			{{retiredDriverNames()}}
+		]
+	}; 
+   </div>
+</div>

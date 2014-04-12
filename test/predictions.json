@@ -1,0 +1,74 @@
+[
+  {
+    "name": "Malaysian Grand Prix",
+    "banker": false,
+    "predictionType": "bothWays",
+    "predictions": [
+      {
+        "driverName": "Nico Hulkenberg",
+        "points": {
+          "grid": 1,
+          "podium": 1,
+          "retire": 1
+        },
+        "selected": false,
+        "totalPoints": 3
+      },
+      {
+        "driverName": "Jenson Button",
+        "points": {
+          "grid": 1,
+          "podium": 1,
+          "retire": 1
+        },
+        "selected": false,
+        "totalPoints": 3
+      },
+      {
+        "driverName": "Romain Grosjean",
+        "points": {
+          "grid": 1,
+          "podium": 2,
+          "retire": 1
+        },
+        "selected": false,
+        "totalPoints": 4
+      }
+    ],
+    "submitted": true,
+    "user_id": "5339a6098edc2744eb7b966f",
+    "_id": "5339a95833229b19ec799b77",
+    "user_name": "test@email.com"
+  },
+  {
+    "name": "Malaysian Grand Prix",
+    "banker": false,
+    "predictionType": "bothWays",
+    "predictions": [
+      {
+        "driverName": "Nico Rosberg",
+        "points": {
+          "grid": 3,
+          "podium": 1,
+          "retire": 2
+        },
+        "selected": false,
+        "totalPoints": 6
+      },
+      {
+        "driverName": "Sebastian Vettel",
+        "points": {
+          "grid": 1,
+          "podium": 2,
+          "retire": 1
+        },
+        "selected": false,
+        "totalPoints": 4
+      }
+    ],
+    "submitted": true,
+    "user_id": "5339a8f533229b19ec799b75",
+    "_id": "5339a91f33229b19ec799b76",
+    "user_name": "andre.vermeulen@gmail.com"
+  }
+]
