@@ -5,13 +5,16 @@ var express = require('express'),
     LocalStrategy = require('passport-local').Strategy,
     UserService = require("./user-service"), 
     PredictionService = require("./prediction-service"),
+    DriverService = require("./driver-service"),
     MongoClient = require("./mongo-client"),
+    RaceResultsService = require("./race-results-service"), 
     async = require("async"),
     url = process.env.GP_IO_MONGO_URL,
-    mongoClient = new MongoClient(url, ["predictions", "users"]),
+    mongoClient = new MongoClient(url, ["predictions", "users", "drivers", "race_results"]),
     userService = new UserService(mongoClient),
     predictionService = new PredictionService(mongoClient),
-    //predictionRoutes = new PredictionRoutes(mongoClient),
+    driverService = new DriverService(mongoClient),
+    raceResultsService = new RaceResultsService(mongoClient),
     app = express();
 //==================================================================
 // Define the strategy to be used by PassportJS
@@ -67,7 +70,10 @@ app.use(express.cookieParser());
 
 app.use(express.bodyParser());
 app.use(express.methodOverride());
-app.use(express.session({ secret: 'die_BlouBulleWetie_vanVerloornie' }));
+app.use(express.session({ 
+    secret: 'die_BlouBulleWetie_vanVerloornie',
+    cookie: { maxAge : 180000 } //1 Hour
+     }));
 app.use(passport.initialize()); // Add passport initialization
 app.use(passport.session());    // Add passport initialization
 app.use(app.router);
@@ -96,6 +102,13 @@ app.post('/login', passport.authenticate('local'),
     res.send(req.user);
 });
 
+// route to log out
+app.post('/logout', function(req, res){
+  req.logOut();
+  res.clearCookie("user");
+  res.send(200);
+});
+
 // route to log in
 app.post('/register', 
   function(req, res) { 
@@ -119,6 +132,12 @@ app.post('/register',
       });
 });
 
+app.get("/drivers", auth, function(req, res){
+  driverService.allDrivers(function(err, drivers){
+    res.send(drivers);
+  });
+});
+
 app.post('/prediction', auth, function(req, res){
   predictionService.store(req.user, JSON.parse(req.body.prediction), 
     function(prediction){
@@ -127,6 +146,12 @@ app.post('/prediction', auth, function(req, res){
     function(err){
       res.send({response : "error", details : err});   
     })
+});
+
+app.get("/prediction-results", function(req, res){
+  var group = driverService.findDriverGroup("Jenson Button");
+  console.log(group + "=> group");
+  res.send({});
 });
 
 app.get('/prediction/:race_name', auth, function(req, res){
@@ -160,25 +185,26 @@ app.get("/predictions/:race_name", auth, function(req, res){
   });
 });
 
-app.get("/users", auth, function(req, res){
-  userService.allUsers(function(err, users){
-    if (err){
-      res.send([]);
-    }
-    else{
-      res.send(users);
-    }
+app.get("/race-results/:race_name", auth, function(req, res){
+  var queryDetails = {
+      name : req.params.race_name
+  };
+  raceResultsService.find({race : req.params.race_name}, function(err, raceResults){
+      raceResults = raceResults || {};
+      res.send(raceResults);  
+  });
+});
+
+app.post("/race-results", auth, function(req, res){
+  var params = req.body,
+      query = {race : params.race};
+
+  raceResultsService.store(query, params, function(raceResult){
+    console.log("done : " + raceResult);
   });
 });
 
 
-
-// route to log out
-app.post('/logout', function(req, res){
-  req.logOut();
-  res.clearCookie("user");
-  res.send(200);
-});
 //==================================================================
 mongoClient.connect(function(){
   http.createServer(app).listen(app.get('port'), function(){

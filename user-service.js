@@ -1,5 +1,3 @@
-var MongoClient = require('mongodb').MongoClient;
-
 var UserServices = function(mongoClient){
 	this.mongoClient = mongoClient;	
 };

@@ -7,13 +7,8 @@ var ScoringEngine = require("scoring-engine"),
 var 
 
 var ScoringService = function(){
-
-	//raceResultsService.findRaceResults(raceName, callback);
-
 	this.scoringEngine = new ScoringEngine();
-
 	this.calculate = function(){
 
 	};
-
 };

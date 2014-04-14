@@ -28,7 +28,6 @@ PredictionService.prototype.findRacePredictions = function(queryDetails, clientC
 			clientCallback(err, predictionList);
 		});
 	});
-
 };
 
 PredictionService.prototype.store = function(user, prediction, doneCallback, errorCallback) {
@@ -44,7 +43,10 @@ PredictionService.prototype.store = function(user, prediction, doneCallback, err
 			},
 			function(racePrediction, callback){
 				prediction.user_id = user.user_id;
-				delete prediction._id;
+				
+				if (prediction._id)
+					delete prediction._id;
+
 				var predictions = self.mongoClient.predictions;
 				if (racePrediction == null){
 					predictions.insert(prediction , callback);
