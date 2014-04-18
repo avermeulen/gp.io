@@ -8,6 +8,7 @@ var express = require('express'),
     DriverService = require("./driver-service"),
     MongoClient = require("./mongo-client"),
     RaceResultsService = require("./race-results-service"), 
+    ScoringService = require("./scoring-engine"),
     async = require("async"),
     url = process.env.GP_IO_MONGO_URL,
     mongoClient = new MongoClient(url, ["predictions", "users", "drivers", "race_results"]),
@@ -15,6 +16,7 @@ var express = require('express'),
     predictionService = new PredictionService(mongoClient),
     driverService = new DriverService(mongoClient),
     raceResultsService = new RaceResultsService(mongoClient),
+    scoringService = new ScoringService(raceResultsService, driverService, predictionService, userService),
     app = express();
 //==================================================================
 // Define the strategy to be used by PassportJS
@@ -72,7 +74,7 @@ app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(express.session({ 
     secret: 'die_BlouBulleWetie_vanVerloornie',
-    cookie: { maxAge : 180000 } //1 Hour
+    cookie: { maxAge : 1800000 } //1 Hour
      }));
 app.use(passport.initialize()); // Add passport initialization
 app.use(passport.session());    // Add passport initialization
@@ -204,6 +206,12 @@ app.post("/race-results", auth, function(req, res){
   });
 });
 
+app.get("/scores/:race_name", auth, function(req, res){
+    var raceName = req.params.race_name;
+    scoringService.calculate(raceName, function(err, scores){
+       res.send(scores);
+    });
+});
 
 //==================================================================
 mongoClient.connect(function(){

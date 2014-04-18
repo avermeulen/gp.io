@@ -35,4 +35,8 @@ RaceResultsService.prototype.store = function(queryDetails, raceResultsParam, re
 		});
 };
 
+RaceResultsService.prototype.findRaceResults = function(raceName, callback) {
+	this.find({race : raceName}, callback);
+};
+
 module.exports = RaceResultsService;

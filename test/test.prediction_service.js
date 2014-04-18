@@ -2,7 +2,8 @@
 
 var PredictionService = require("../prediction-service"),
 	MongoClient = require("../mongo-client"),
-	assert = require("assert");
+	assert = require("assert"),
+	async = require("async");
 
 describe("Prediction Service", function () {
 	var url = "mongodb://127.0.0.1:27017/gp_io",
@@ -61,6 +62,14 @@ describe("Prediction Service", function () {
 	  		})
 	  		
 	  	
+	  });
+	});
+
+	describe("findRacePredictions", function(done){
+	  it("should find the predictions", function(){
+	  	predictionService.findRacePredictions({name : "Malaysian Grand Prix"}, function(){
+	  		
+	  	});
 	  });
 	});
 

@@ -13,6 +13,22 @@ var FindDriver = function(driverName){
                 callback(null, results);
             }
         }
+    },
+    FindPredictionResults = function(results){
+    	return {
+    		findPredictionsForRace : function(raceName, callback){
+    			callback(null, results);
+    		}
+    	}
+    },
+    FindUser = function(){
+    	return {
+    		findUserById : function(id, callback){
+    			callback(null, {
+    				user_name : "user1"
+    			});
+    		}
+    	};
     };
 
 describe("Scoring Service", function(){
@@ -46,8 +62,8 @@ describe("Scoring Service", function(){
 		      }
 
 		    ],
-		     submitted : true,
-		     user_id : "5339a6098edc2744eb7b966f",
+		    submitted : true,
+		    user_id : "5339a6098edc2744eb7b966f",
 		    _id : "5339a95833229b19ec799b77",
 		    user_name : "test@email.com"
 		  }
@@ -68,10 +84,17 @@ describe("Scoring Service", function(){
 			]
 		};
 
-		var scoringEngine = new ScoringEngine(new FindRaceResults(results), new FindDriver());
-		var scoringPredictions = scoringEngine.calculate(predictions, 
+		var scoringEngine = new ScoringEngine(new FindRaceResults(results), 
+				new FindDriver(), 
+				new FindPredictionResults(predictions),
+				new FindUser());
+
+		var scoringPredictions = scoringEngine.calculate("raceName", 
 				function(err, predictions){
                 	scoringPredictions = predictions;
+                	
+                	console.log(JSON.stringify(scoringPredictions));
+
                 	var prediction = scoringPredictions[0];
 					assert.equal(16, prediction.predictions[0].points);
 					assert.equal(24, prediction.predictions[1].points);
@@ -134,7 +157,9 @@ describe("Scoring Service", function(){
 
 		var scoringEngine = new ScoringEngine(
             new FindRaceResults(results),
-            new FindDriver());
+            new FindDriver(),
+            new FindPredictionResults(predictions),
+            new FindUser());
 
 		var scoringPredictions = scoringEngine.calculate(predictions, function(err, scoringPredictions){
         	var prediction = scoringPredictions[0];
@@ -198,12 +223,12 @@ describe("Scoring Service", function(){
 			]
 		};
 
-		var scoringEngine = new ScoringEngine(new FindRaceResults(results), new FindDriver());
-		var scoringPredictions = scoringEngine.calculate(predictions);
+		var scoringEngine = new ScoringEngine(new FindRaceResults(results), 
+			new FindDriver(), 
+			new FindPredictionResults(predictions),
+			new FindUser());
 
-		//console.log(JSON.stringify(scoringPredictions));
-		//assert.equal(32, scoringPredictions[0].predictions[0].points);
-		//assert.equal(48, scoringPredictions[0].predictions[1].points);
+		var scoringPredictions = scoringEngine.calculate(predictions);
 
 		done();
 

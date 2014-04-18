@@ -25,27 +25,29 @@ UserServices.prototype.addUser = function(user, success, error){
 
 	user.email = user.email.toLowerCase();
 	
-	var addUser = function(){
+	var addUserFunc = function(){
 		users.insert(user, function(err, docs){
-			err ? error("error", err) : success(null, "success", user);
+			err ? error(err, "error") : success(null, "success", user);
 		});
 	};
 
-	users.findOne({email : user.email.toLowerCase()}, function(err, user){
+	users.findOne({email : user.email.toLowerCase()}, function(err, theUser){
 		if(err)
 			error(err, "login_error");		
 		else
-			user === null ? addUser() : error("username_already_exists");
+			theUser === null ? addUserFunc() : error("username_already_exists");
 	});
 };
 
 UserServices.prototype.allUsers = function(callback){
 	var users = this.mongoClient.users;
-
 	var usernames = users.find({}, {email:1}).toArray(function(err, users){
 		callback(null, users);
 	});
+};
 
-}
+UserServices.prototype.findUserById = function(id, callback){
+	this.mongoClient.findById("users", id, callback);
+};
 
 module.exports = UserServices;

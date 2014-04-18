@@ -37,8 +37,10 @@ var findScoringPredictions = function(raceResults, predictions){
 			var userScoringPredictions = {
 				user_id : userPrediction.user_id,
 				prediction_id : userPrediction._id,
+				banker : userPrediction.banker,
+				raceName : userPrediction.name,
 				predictions : [],
-                banker : userPrediction.banker
+                
 			};
 			userPrediction.predictions.forEach(function(prediction){
 				var theResults = findDriverResults(raceResults, prediction);
@@ -56,13 +58,18 @@ var findScoringPredictions = function(raceResults, predictions){
 		return scoringPredictions;
 	};
 
-
 var calculatePoints = function(scoringPrediction){
-		var driver = scoringPrediction.driver;
+		
 		scoringPrediction.predictions.forEach(function(predictionEntry){
+
+			var driver = predictionEntry.driver;
+
+			console.log( "calculatePoints : " +  JSON.stringify(predictionEntry));
+
 			predictionEntry.points = 0;
 			predictionEntry.pointsByType = {};
 
+			//todo find a better way to find the first entry in the list
 			var scheduleToUse = pointsSchedule.filter(function(schedule){
 				return schedule.group == driver.group;
 			})[0];
@@ -95,36 +102,89 @@ var calculatePoints = function(scoringPrediction){
         });
 	};
 
-module.exports = function(raceResultsService, driverService){
-    
-    var findDriversForPrediction = function(scoringPrediction, callback){
-		var predictions = scoringPrediction.predictions;
-		predictions.forEach(function(prediction){
-			driverService.findDriverByName(prediction.driverName, function(err, driver){
-				scoringPrediction.driver = driver;
-				setTimeout(callback, 20);
-			});
+	var calculateGrandTotal = function(prediction){
+    	var totalPoints = prediction.predictions.reduce(function(prev, current){
+    		return prev + current.points;
+    	}, 0);
+    	prediction.totalPoints = totalPoints;
+    };
+
+    var calculatePointsByCategory = function(prediction){
+    	var pointsByCategory = prediction.predictions.reduce(function(prev, current){
+    		
+    		 console.log(JSON.stringify(current.pointsByType));	
+    		 console.log(JSON.stringify(prev));
+
+    		 prev.grid += current.pointsByType && current.pointsByType.grid ? current.pointsByType.grid : 0;
+    		 prev.podium += current.pointsByType.podium ? current.pointsByType.podium : 0;
+    		 prev.retire += current.pointsByType.retire ? current.pointsByType.retire : 0;
+    		 return prev;
+    		 
+    	}, {grid : 0, podium : 0, retire : 0});
+    	prediction.pointsByCategory = pointsByCategory;
+    };
+
+module.exports = function(raceResultsService, driverService, predictionService, userService){
+
+    var enrichUserPrediction = function(scoringPrediction, resultCallback){
+    	var predictions = scoringPrediction.predictions;
+		async.mapSeries(predictions, 
+			function(prediction, callback){
+				async.series({
+					driver : function(cb){
+						driverService.findDriverByName(prediction.driverName, function(err, driver){
+							cb(null, driver);	
+						});
+					},
+					user : function(cb){
+						userService.findUserById(scoringPrediction.user_id, function(err, user){
+							delete user.password
+							cb(null, user);
+						});
+					}
+				},
+				function(err, results){
+					prediction.driver = results.driver;
+					scoringPrediction.user_name = results.user.email;
+					callback(err, prediction);
+				}
+			);
+		}, function(err, mappedPredictions){
+			scoringPrediction.predictions = mappedPredictions;
+			resultCallback(err, scoringPrediction);
 		});
 	};
 
-	var findDrivers = function(scoringPredictions){
-		async.each(scoringPredictions, findDriversForPrediction);
-	};
+	var enrichPredictions = function(scoringPredictions, callback){
+        async.mapSeries(scoringPredictions, enrichUserPrediction, function(err, predictions){
+        	callback(predictions);
+        });
+    };
 
 	return {
-		calculate : function(userPredictions, resultCallback){
+		calculate : function(raceName, resultCallback){
+			var userPredictions = null;
 	        async.waterfall(
 	        [
-	            function(callback){
-	                var raceName = _(userPredictions).pluck("name").first();
+	        	function(callback){
+	        		predictionService.findPredictionsForRace(raceName, callback);
+	        	},
+	            function(userPredictionsForRace, callback){
+	                userPredictions = userPredictionsForRace;
 	                raceResultsService.findRaceResults(raceName, callback);
 	            },
 	            function(raceResults, callback){
 	                var predictions = findScoringPredictions(raceResults, userPredictions);
-	                findDrivers(predictions)
-	                predictions.forEach(calculatePoints);
-	                predictions.forEach(doubleScoreIfBankPlayed);
-	                callback(null, predictions);
+	                enrichPredictions(predictions, function(enrichedPredictions){
+	                	enrichedPredictions.forEach(function(prediction){
+	                		calculatePoints(prediction);
+							doubleScoreIfBankPlayed(prediction);
+							calculateGrandTotal(prediction);
+							calculatePointsByCategory(prediction);
+						});
+
+	                	callback(null, enrichedPredictions);	
+	                });
 	            }
 	        ],
 	        resultCallback);

@@ -30,23 +30,20 @@ var drivers = [
 			];	
 
 
-describe("Prediction Service", function () {
+describe("Adding Drivers Service", function () {
 	var url = "mongodb://127.0.0.1:27017/gp_io",
 		mongoClient = new MongoClient(url, ["drivers"]);
 
+	/*	
 	it("Should add drivers", function(done){
 		mongoClient.connect(function(){
 			console.log("initialized");
 			var predictions = mongoClient.predictions;
-			
-			/*
 			mongoClient.drivers.insert(drivers, function(){
 				done();	
-			});
-			*/
-			
+			});			
 		});
-		
-
 	});
+	*/
+
 });

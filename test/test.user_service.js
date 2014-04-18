@@ -9,11 +9,16 @@ describe("UserService", function(){
       userService = null;
 
   beforeEach(function(done){
+    //var d = done;
     mongoClient.connect(function(){
-      mongoClient.users.remove({email : "test@email.com"}, function(){});
-      userService = new UserService(mongoClient);
-      done();
+        mongoClient.users.remove({email : "test@email.com"}, function(err){
+          if (err) done(err);
+
+          userService = new UserService(mongoClient);
+          done();
+        });
     });
+
   });
 
   describe("addUser and Login", function(){
@@ -22,14 +27,20 @@ describe("UserService", function(){
         async.waterfall([
         	function(callback){
             	userService.addUser(userDetails, 
-        				 callback,
-        				 callback);
+        				 function(){
+                    console.log("...")
+                  },
+        				 function(){
+                  console.log("444")
+                  });
             },
+            /*
             function(status, user, callback){
             	userService.login(userDetails, 
             		callback, 
             		callback);
-            },
+            }
+            */
         ],
         function(err, result){
             assert.equal(err, null, err);
@@ -56,10 +67,11 @@ describe("UserService", function(){
             },
         ],
         function(err, result){
-            assert.equal(err, null, err);
+          console.log("arguments : " + arguments);
 
-            assert.equal("login_success", result);
-            done();
+          assert.equal(err, null, err);
+          assert.equal("login_success", result);
+          //setTimeout(done, 250);
         });
     });
   });
@@ -102,9 +114,7 @@ describe("UserService", function(){
                  callback);
             },
         ],
-        function(status){
-            //assert.equal(status, null, status);
-          
+        function(status){          
             assert.equal("username_already_exists", status);
             done();
         });

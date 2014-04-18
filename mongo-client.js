@@ -16,7 +16,13 @@ MongoClient.prototype.connect = function(connectedCallback){
 		setupCollections.call(self, db);
 		connectedCallback();
 	});
-}
+};
+
+MongoClient.prototype.findById = function(collectionName, id, callback){
+	var self = this;
+	var collection = self[collectionName];
+	collection.findOne({_id : self.Id(id)}, callback);
+};
 
 MongoClient.prototype.collection = function(collection){
 	return mongoDB.collection(collection);

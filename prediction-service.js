@@ -16,19 +16,44 @@ PredictionService.prototype.findRacePredictions = function(queryDetails, clientC
 	var predictionList = [];
 
 	var racePredictions = self.mongoClient.predictions.find(queryDetails);
-	racePredictions.toArray(function(err, predictions){
-		async.each(predictions, function(prediction, callback){
-			self.mongoClient.users.findOne({_id : self.mongoClient.Id(prediction.user_id)},
-				function(err, user){
-					prediction.user_name = user.email;
-					predictionList.push(prediction);
-					callback(err);
-				});
-		}, function(err){
-			clientCallback(err, predictionList);
-		});
-	});
+	racePredictions.toArray(
+		function(err, predictions){
+			async.each(predictions, 
+				function(prediction, callback){
+					self.mongoClient.users.findOne(
+						{_id : self.mongoClient.Id(prediction.user_id)},
+						function(err, user){
+							if (!err){
+								prediction.user_name = user.email;
+								predictionList.push(prediction);
+							}
+							callback(err);
+					});
+				}, 
+				function(err){
+					clientCallback(err, predictionList);
+				}
+			);
+		}
+	);
 };
+
+PredictionService.prototype.findUserNameForPrediction = function(prediction, callback){
+	var self = this;
+	self.mongoClient.users.findOne(
+		{_id : self.mongoClient.Id(prediction.user_id)},
+		function(err, user){
+			if (!err){
+				prediction.user_name = user.email;
+				//predictionList.push(prediction);
+			}
+			callback(err, prediction);
+	});
+}
+
+PredictionService.prototype.findPredictionsForRace = function(raceName, callback){
+	this.findRacePredictions({name : raceName, submitted : true}, callback)
+}
 
 PredictionService.prototype.store = function(user, prediction, doneCallback, errorCallback) {
 	var self = this;	

@@ -1,14 +1,17 @@
 "use strict";
 
-var ScoringEngine = require("scoring-engine"),
-	PredictionService = require("prediction-service");
+var ScoringEngine = require("scoring-engine");
 
-
-var 
-
-var ScoringService = function(){
-	this.scoringEngine = new ScoringEngine();
-	this.calculate = function(){
-
-	};
+var ScoringService = function(raceResultsService, driverService, predictionService){
+	var self = this;
+	self.scoringEngine = new ScoringEngine(raceResultsService, driverService, predictionService);
+	return {
+		score : function(raceName, callback){
+            self.scoringEngine.score(raceName, callback);
+		}
+	}
 };
+
+//module.exports = ScoringService;
+
+
