@@ -235,10 +235,49 @@ app.get("/scores", function(req, res){
         res.send(results);
       }
     )
-    
   });
-
 });
+
+app.get("/scores-summary", function(req, res){
+  var raceResults = mongoClient.race_results.find({},{_id:0,race:1});
+  raceResults.toArray(function(err, race_results){
+    async.map(race_results, 
+      function(race_result, done){
+        var raceName = race_result.race;
+        scoringService.calculate(raceName, function(err, scores){
+          var vals = _.map(scores, function(score){
+            return _.pick(score, 'user_name', 'totalPoints');
+          })
+          done(err, vals);
+        });     
+      },
+      function(err, results){
+        var values = _.flatten(results);
+        var groupedUsers = _.groupBy(values, function(value){return value.user_name});
+
+        var users = _.keys(groupedUsers);
+
+        var pointsByUser = users.map(function(user){
+           var list = groupedUsers[user];
+
+           var total = list.reduce(function(prev, current){
+              return prev + current.totalPoints;
+           }, 0);
+
+           return {
+            user_name : user,
+            totalPoints : total
+           };
+        })
+
+        res.send(_.sortBy(pointsByUser, function(userPoints){
+            return userPoints.totalPoints * -1;
+        }));
+      }
+    )
+  });
+});
+
 
 //==================================================================
 mongoClient.connect(function(){
