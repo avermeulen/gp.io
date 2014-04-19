@@ -2,6 +2,7 @@ var express = require('express'),
     http = require('http'),
     path = require('path'),
     passport = require('passport'),
+    _ = require('lodash'),
     LocalStrategy = require('passport-local').Strategy,
     UserService = require("./user-service"), 
     PredictionService = require("./prediction-service"),
@@ -212,6 +213,31 @@ app.get("/scores/:race_name", auth, function(req, res){
     scoringService.calculate(raceName, function(err, scores){
        res.send(scores);
     });
+});
+
+app.get("/scores", function(req, res){
+  var raceResults = mongoClient.race_results.find({},{_id:0,race:1});
+  raceResults.toArray(function(err, race_results){
+    async.map(race_results, 
+      function(race_result, done){
+        var raceName = race_result.race;
+        scoringService.calculate(raceName, function(err, scores){
+          var vals = _.map(scores, function(score){
+            return _.pick(score, 'user_name', 'totalPoints', 'pointsByCategory');
+          })
+          done(err, {
+            raceName : raceName,
+            scores : vals
+          });
+        });     
+      },
+      function(err, results){
+        res.send(results);
+      }
+    )
+    
+  });
+
 });
 
 //==================================================================

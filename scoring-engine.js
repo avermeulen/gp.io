@@ -63,9 +63,6 @@ var calculatePoints = function(scoringPrediction){
 		scoringPrediction.predictions.forEach(function(predictionEntry){
 
 			var driver = predictionEntry.driver;
-
-			console.log( "calculatePoints : " +  JSON.stringify(predictionEntry));
-
 			predictionEntry.points = 0;
 			predictionEntry.pointsByType = {};
 
@@ -111,10 +108,6 @@ var calculatePoints = function(scoringPrediction){
 
     var calculatePointsByCategory = function(prediction){
     	var pointsByCategory = prediction.predictions.reduce(function(prev, current){
-    		
-    		 console.log(JSON.stringify(current.pointsByType));	
-    		 console.log(JSON.stringify(prev));
-
     		 prev.grid += current.pointsByType && current.pointsByType.grid ? current.pointsByType.grid : 0;
     		 prev.podium += current.pointsByType.podium ? current.pointsByType.podium : 0;
     		 prev.retire += current.pointsByType.retire ? current.pointsByType.retire : 0;
